@@ -5,10 +5,10 @@ import { SearchBar } from "./search-bar";
 export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="mx-auto max-w-[1312px] px-5 pt-5 lg:px-0">
-      <div className="grid overflow-hidden rounded-[28px] bg-cc-surface lg:grid-cols-[1.0fr_1.07fr]">
-        <div className="order-2 flex flex-col justify-center px-6 py-10 sm:px-10 lg:order-1 lg:px-10 lg:py-12">
+      <div className="grid grid-cols-[minmax(0,1fr)] overflow-hidden rounded-[28px] bg-cc-surface lg:grid-cols-[1fr_1.07fr]">
+        <div className="order-2 flex min-w-0 flex-col justify-center px-6 py-10 sm:px-10 lg:order-1 lg:px-10 lg:py-12">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cc-blue">Less spending. More living.</p>
-          <h1 id="hero-title" className="mt-6 text-[40px] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-[48px] lg:text-[52px]">
+          <h1 id="hero-title" className="mt-6 text-[32px] font-semibold leading-[1.1] min-[400px]:text-[38px] tracking-[-0.035em] sm:text-[48px] lg:text-[52px]">
             Big campus energy.<br />Small price tags.
           </h1>
           <p className="mt-6 text-[17px] leading-[1.55] text-cc-muted">

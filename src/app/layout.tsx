@@ -1,5 +1,4 @@
 import "./globals.css"; // first: declares the cascade-layer order
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Theme } from "@astryxdesign/core/theme";
 import { themes, defaultThemeSlug } from "@/astryx-themes";
@@ -20,9 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-cc-ink focus:px-4 focus:py-2 focus:text-white">
             Skip to content
           </a>
-          <Suspense fallback={<div className="h-[72px] border-b border-cc-line lg:h-[88px]" />}>
-            <Header />
-          </Suspense>
+          <Header />
           <main id="main">{children}</main>
           <Footer />
         </Theme>

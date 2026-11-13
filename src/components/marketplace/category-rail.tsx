@@ -10,7 +10,7 @@ export function CategoryRail({ onChange }: { onChange?: (slug: string) => void }
         <h2 id="cat-title" className="text-[28px] font-semibold tracking-[-0.03em]">A little bit of everything.</h2>
         <p className="hidden text-[15px] text-cc-muted sm:block">Find your kind of essential.</p>
       </div>
-      <ul className="no-scrollbar -mx-5 mt-6 flex snap-x gap-4 overflow-x-auto px-5 pb-1 lg:mx-0 lg:px-0">
+      <ul className="no-scrollbar -mx-5 mt-6 flex scroll-px-5 snap-x gap-4 overflow-x-auto px-5 pb-1 lg:mx-0 lg:px-0">
         {CATEGORIES.map(({ slug, name, blurb, icon: Icon }) => {
           const on = slug === active;
           return (
