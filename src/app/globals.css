@@ -54,3 +54,6 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Pin text to the Campus Cart ink token so it never inherits a theme default. */
+header, main, footer { color: var(--cc-ink); }
