@@ -1,26 +1,56 @@
-@import "tailwindcss";
+@layer reset, theme, base, astryx-base, astryx-theme, components, utilities;
 
+@import "tailwindcss";
+@import "@astryxdesign/core/reset.css";
+@import "@astryxdesign/core/astryx.css";
+
+/* Campus Cart design tokens (taken from the Figma Make reference). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cc-bg: #ffffff;
+  --cc-surface: #f3f4f7;
+  --cc-surface-blue: #eef2fb;
+  --cc-ink: #1c1c1e;
+  --cc-ink-muted: #6b7280;
+  --cc-ink-subtle: #8a8f98;
+  --cc-line: #e7e8ec;
+  --cc-blue: #0a60e8;
+  --cc-blue-hover: #084fc0;
+  --cc-radius-card: 20px;
+  --cc-radius-panel: 28px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cc-bg: var(--cc-bg);
+  --color-cc-surface: var(--cc-surface);
+  --color-cc-surface-blue: var(--cc-surface-blue);
+  --color-cc-ink: var(--cc-ink);
+  --color-cc-muted: var(--cc-ink-muted);
+  --color-cc-subtle: var(--cc-ink-subtle);
+  --color-cc-line: var(--cc-line);
+  --color-cc-blue: var(--cc-blue);
+  --color-cc-blue-hover: var(--cc-blue-hover);
+  --font-sans: Inter, "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html { background: var(--cc-bg); }
+  body {
+    background: var(--cc-bg);
+    color: var(--cc-ink);
+    font-family: Inter, "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
+  :focus-visible { outline: 2px solid var(--cc-blue); outline-offset: 2px; }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
