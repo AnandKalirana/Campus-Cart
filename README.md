@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Campus Cart
 
-## Getting Started
+Student-to-student marketplace. *Less spending. More living.*
 
-First, run the development server:
+`/` is the marketplace itself. Browsing, search, categories and product pages need no account. Login is required only to sell, contact a seller, keep a wishlist, send purchase requests and manage an account.
 
+## Stack
+Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind 4 · AstraX (theme + base CSS) · Lucide · Framer Motion · Zod · Prisma 7 + PostgreSQL.
+
+## Getting started
 ```bash
+npm install            # also runs `prisma generate`
+cp .env.example .env.local   # fill in values; never commit this file
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Database
+```bash
+npm run db:migrate -- --name init   # creates and applies the first migration
+npm run db:seed                     # categories + placeholder campuses
+```
+Seeded campuses have **no email domains** on purpose. An admin must set real institutional domains before verification works.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
+`dev` · `build` · `start` · `lint` · `typecheck` · `db:migrate` · `db:deploy` · `db:seed` · `db:studio`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Status
+| Area | State |
+|---|---|
+| Homepage, header, footer, How it works | Built. Product images are local SVG stand-ins, replace with real photos. |
+| Prisma schema, DB client, env validation, seed | Built. Schema validates and the client generates. Migrations not yet created or run against a database. |
+| Authentication, listings, wishlist, messaging, requests, admin | Not started (placeholder pages). |
+| Tests, CI, security headers, rate limiting | Not started. |
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Homepage products are **demo data** (`src/lib/catalog.ts`), not real inventory.
