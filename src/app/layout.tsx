@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="antialiased">
+    <html lang="en" className="antialiased" style={{ colorScheme: "light" }}>
       <body className="min-h-screen">
-        <Theme theme={themes[defaultThemeSlug]}>
+        <Theme theme={themes[defaultThemeSlug]} mode="light">
           <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-cc-ink focus:px-4 focus:py-2 focus:text-white">
             Skip to content
           </a>
