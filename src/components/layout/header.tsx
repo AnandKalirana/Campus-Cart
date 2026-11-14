@@ -5,6 +5,7 @@ import { Logo } from "@/components/ui/logo";
 import { CampusSelector } from "./campus-selector";
 import { MobileMenu } from "./mobile-menu";
 import { NavLinks, NavLinksFallback } from "./nav-links";
+import { AccountMenu } from "./account-menu";
 
 export function Header() {
   return (
@@ -18,7 +19,7 @@ export function Header() {
           <CampusSelector />
           <Link href="/wishlist" aria-label="Wishlist" className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-cc-surface"><Heart size={22} strokeWidth={1.5} /></Link>
           <Link href="/messages" aria-label="Messages" className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-cc-surface"><MessageCircle size={22} strokeWidth={1.5} /></Link>
-          <Link href="/login" className="text-[15px] font-medium transition-colors hover:text-cc-blue">Log in</Link>
+          <Suspense fallback={<Link href="/login" className="text-[15px] font-medium">Log in</Link>}><AccountMenu /></Suspense>
           <Link href="/sell" className="flex h-11 items-center gap-2.5 rounded-full bg-cc-ink px-6 text-[15px] font-medium text-white transition-[transform,background-color] duration-150 hover:bg-black active:scale-[0.97]">
             <Plus size={18} aria-hidden /> Sell an item
           </Link>

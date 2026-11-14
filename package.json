@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test": "tsx --conditions=react-server --test \"src/**/*.test.ts\""
   },
   "dependencies": {
     "@astryxdesign/core": "^0.7.15",
@@ -23,6 +24,7 @@
     "framer-motion": "^14.13.0",
     "lucide-react": "^1.72.0",
     "next": "16.4.6",
+    "next-auth": "^5.0.0-beta.32",
     "pg": "8.23.1",
     "prisma": "7.10.1",
     "react": "19.3.0",
