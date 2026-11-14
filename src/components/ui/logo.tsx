@@ -3,11 +3,11 @@ import { ShoppingBag } from "lucide-react";
 
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <Link href="/" aria-label="Campus Cart home" className={`flex items-center gap-3 ${className}`}>
-      <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-cc-ink text-white">
-        <ShoppingBag size={20} strokeWidth={1.75} aria-hidden />
+    <Link href="/" aria-label="Campus Cart home" className={`group flex items-center gap-2 ${className}`}>
+      <span className="bg-black p-2.5 text-white transition-[rotate] duration-100 [rotate:-5deg] group-hover:[rotate:0deg] lg:p-3">
+        <ShoppingBag size={26} strokeWidth={2} aria-hidden />
       </span>
-      <span className="text-[22px] font-semibold tracking-tight">campus cart</span>
+      <span className="font-raw text-2xl leading-[0.9] lg:text-4xl">Campus<br />Cart</span>
     </Link>
   );
 }
