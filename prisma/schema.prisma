@@ -70,17 +70,19 @@ model University {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  email         String        @unique // stored lowercase; normalized in the service layer
-  emailVerified DateTime? // set only after the token flow completes; gates selling/messaging
-  passwordHash  String? // null for OAuth-only accounts. Argon2id/bcrypt hash only, never plaintext.
-  name          String
-  image         String?
-  role          Role          @default(STUDENT)
-  status        AccountStatus @default(ACTIVE)
-  universityId  String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id             String        @id @default(cuid())
+  email          String        @unique // stored lowercase; normalized in the service layer
+  emailVerified  DateTime? // set only after the token flow completes; gates selling/messaging
+  passwordHash   String? // null for OAuth-only accounts. Argon2id/bcrypt hash only, never plaintext.
+  name           String
+  image          String?
+  role           Role          @default(STUDENT)
+  status         AccountStatus @default(ACTIVE)
+  // Bumped on password reset (and by admins) so already-issued JWT sessions stop working.
+  sessionVersion Int           @default(0)
+  universityId   String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   university University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
 

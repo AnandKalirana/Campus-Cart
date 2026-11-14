@@ -1,7 +1,7 @@
 import "./globals.css"; // first: declares the cascade-layer order
 import type { Metadata } from "next";
 import { Theme } from "@astryxdesign/core/theme";
-import { themes, defaultThemeSlug } from "@/astryx-themes";
+import { neutralTheme } from "@/lib/theme";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="antialiased" style={{ colorScheme: "light" }}>
       <body className="min-h-screen">
-        <Theme theme={themes[defaultThemeSlug]} mode="light">
+        <Theme theme={neutralTheme} mode="light">
           <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-cc-ink focus:px-4 focus:py-2 focus:text-white">
             Skip to content
           </a>
