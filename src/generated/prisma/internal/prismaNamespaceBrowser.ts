@@ -105,6 +105,7 @@ export const UserScalarFieldEnum = {
   image: 'image',
   role: 'role',
   status: 'status',
+  sessionVersion: 'sessionVersion',
   universityId: 'universityId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
