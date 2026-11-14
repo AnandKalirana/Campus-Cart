@@ -1,4 +1,13 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ComingSoon } from "@/components/ui/coming-soon";
-export const metadata: Metadata = { title: "Sell an item" };
-export default function Page() { return <ComingSoon title="Sell an item" phase="Phase 3 and 4" note="Listing requires a verified student account. Authentication comes first, then the listing form." />; }
+import { requireUser } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Sell an item", robots: { index: false } };
+
+// Server-side gate: anonymous visitors are redirected to log in, then returned here.
+async function Gate() {
+  await requireUser("/sell");
+  return <ComingSoon title="Sell an item" phase="Signed in" note="Listing needs a verified student account. The listing form arrives in Phase 4." />;
+}
+export default function Page() { return <Suspense fallback={<div className="h-64" aria-busy="true" />}><Gate /></Suspense>; }

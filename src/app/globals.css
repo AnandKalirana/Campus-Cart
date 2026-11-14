@@ -54,3 +54,7 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Primary text is black. Unlayered on purpose: it must beat any theme default, including dark-mode white. */
+:root { --cc-text: #000000; }
+html, body, header, main, footer, h1, h2, h3, h4, h5, h6 { color: var(--cc-text); }
