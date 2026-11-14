@@ -12,7 +12,7 @@ async function Body({ searchParams }: { searchParams: Promise<{ token?: string }
   const { token } = await searchParams;
   return (
     <AuthCard title="Verify your email">
-      {token ? <VerifyButton token={token} /> : <p className="text-sm text-cc-muted">This link is missing its token. <Link href="/login" className="text-cc-blue hover:underline">Log in</Link> to request another.</p>}
+      {token ? <VerifyButton token={token} /> : <p className="text-base font-bold">This link is missing its token. <Link href="/login" className="font-bold underline underline-offset-4 decoration-2 hover:bg-black hover:text-white">Log in</Link> to request another.</p>}
     </AuthCard>
   );
 }

@@ -4,43 +4,117 @@
 @import "@astryxdesign/core/reset.css";
 @import "@astryxdesign/core/astryx.css";
 
-/* Campus Cart design tokens (taken from the Figma Make reference). */
+/* Campus Cart "raw" (neo-brutalist) design tokens, from the Superdesign draft.
+   Contrast notes: black text is used on orange/green/yellow/pink/sky (all >= 6:1).
+   White text is used only on black or on red-600 (4.8:1). Do not put orange/green text on light grey. */
 :root {
-  --cc-bg: #ffffff;
-  --cc-surface: #f3f4f7;
-  --cc-surface-blue: #eef2fb;
-  --cc-ink: #1c1c1e;
-  --cc-ink-muted: #6b7280;
-  --cc-ink-subtle: #8a8f98;
-  --cc-line: #e7e8ec;
-  --cc-blue: #0a60e8;
-  --cc-blue-hover: #084fc0;
-  --cc-radius-card: 20px;
-  --cc-radius-panel: 28px;
+  --cc-paper: #e5e5e5;
+  --cc-white: #ffffff;
+  --cc-ink: #000000;
+  --cc-ink-muted: #3f3f3f;   /* 8.9:1 on paper */
+  --cc-orange: #ff4f00;
+  --cc-green: #00ff00;
+  --cc-yellow: #facc15;
+  --cc-pink: #f472b6;
+  --cc-sky: #60a5fa;
+  --cc-red: #dc2626;
+  --bru-shadow: 6px;
 }
+@media (min-width: 768px) { :root { --bru-shadow: 10px; } }
 
 @theme inline {
-  --color-cc-bg: var(--cc-bg);
-  --color-cc-surface: var(--cc-surface);
-  --color-cc-surface-blue: var(--cc-surface-blue);
+  --color-cc-paper: var(--cc-paper);
   --color-cc-ink: var(--cc-ink);
   --color-cc-muted: var(--cc-ink-muted);
-  --color-cc-subtle: var(--cc-ink-subtle);
-  --color-cc-line: var(--cc-line);
-  --color-cc-blue: var(--cc-blue);
-  --color-cc-blue-hover: var(--cc-blue-hover);
-  --font-sans: "Inter Variable", Inter, "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+  --color-cc-orange: var(--cc-orange);
+  --color-cc-green: var(--cc-green);
+  --color-cc-yellow: var(--cc-yellow);
+  --color-cc-pink: var(--cc-pink);
+  --color-cc-sky: var(--cc-sky);
+  --color-cc-red: var(--cc-red);
+  --font-sans: "Space Grotesk Variable", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-raw: "Archivo Black", Impact, "Arial Black", sans-serif;
 }
 
 @layer base {
-  html { background: var(--cc-bg); }
+  html { background: var(--cc-paper); overflow-x: clip; }
   body {
-    background: var(--cc-bg);
-    color: var(--cc-ink);
-    font-family: "Inter Variable", Inter, "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+    background-color: var(--cc-paper);
+    /* experimental grid from the draft */
+    background-image:
+      linear-gradient(rgba(0,0,0,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.08) 1px, transparent 1px);
+    background-size: 50px 50px;
+    font-family: "Space Grotesk Variable", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
   }
-  :focus-visible { outline: 2px solid var(--cc-blue); outline-offset: 2px; }
+  ::selection { background: #000; color: #fff; }
+  /* Double ring stays visible on paper, white and coloured blocks. */
+  :focus-visible { outline: 3px solid #000; outline-offset: 3px; box-shadow: 0 0 0 3px #fff; }
+  .on-dark :focus-visible { outline-color: #fff; box-shadow: 0 0 0 3px #000; }
+}
+
+@layer components {
+  .font-raw { font-family: var(--font-raw); text-transform: uppercase; letter-spacing: -0.03em; }
+
+  /* Card: lifts toward the cursor on hover (pointer devices only). */
+  .bru-card {
+    border: 4px solid #000; background: #fff; box-shadow: var(--bru-shadow) var(--bru-shadow) 0 #000;
+    transition: transform 100ms ease-out, box-shadow 100ms ease-out, rotate 100ms ease-out;
+  }
+  @media (hover: hover) {
+    .bru-card-lift:hover { transform: translate(-4px, -4px); box-shadow: calc(var(--bru-shadow) + 4px) calc(var(--bru-shadow) + 4px) 0 #000; }
+  }
+
+  button.bru-card-lift:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #000; }
+
+  /* Button: lifts slightly on hover, presses flat on click. */
+  .bru-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem; white-space: nowrap;
+    border: 3px solid #000; box-shadow: 6px 6px 0 #000; font-family: var(--font-raw); text-transform: uppercase;
+    transition: transform 50ms ease-out, box-shadow 50ms ease-out, rotate 100ms ease-out, background-color 100ms, color 100ms; cursor: pointer;
+  }
+  @media (hover: hover) {
+    .bru-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 #000; }
+  }
+  .bru-btn:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 0 0 0 #000; }
+  .bru-btn:disabled { opacity: .6; cursor: not-allowed; box-shadow: 3px 3px 0 #000; }
+  /* Dark sections: AstraX's reset sets colour directly on headings/paragraphs, so inheritance alone is not enough. */
+  .on-dark { color: #fff; }
+  .on-dark :is(h1, h2, h3, h4, h5, h6, p, li) { color: inherit; }
+  .on-dark .bru-btn { border-color: #fff; box-shadow: 6px 6px 0 #fff; }
+  .on-dark .bru-btn:active:not(:disabled) { box-shadow: 0 0 0 #fff; }
+
+  /* Nav link: underlined; inverts on hover. */
+  .bru-link { white-space: nowrap; text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 4px; padding: 0 .5rem; transition: background-color 100ms, color 100ms; }
+  .bru-link:hover { background: #000; color: #fff; }
+
+  /* Individual `rotate` property so tilt composes with the hover/press `transform` instead of being replaced by it. */
+  .tilt-1 { rotate: -1.5deg; }
+  .tilt-2 { rotate: 2deg; }
+  .tilt-1, .tilt-2 { transition: rotate 100ms ease-out; }
+  @media (hover: hover) { .untilt:hover { rotate: 0deg; } }
+
+  .strike-bold { text-decoration: line-through; text-decoration-thickness: 3px; }
+
+  .bru-input {
+    width: 100%; border: 4px solid #000; background: #fff; padding: .75rem 1rem; font-size: 1.05rem; font-weight: 600; outline: none;
+    transition: background-color 100ms;
+  }
+  .bru-input:focus { background: #fef9c3; }
+  .bru-input::placeholder { color: #595959; font-weight: 500; }
+  .bru-input[aria-invalid="true"] { border-color: var(--cc-red); }
+
+  @keyframes cc-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .marquee-track { display: flex; width: max-content; animation: cc-marquee 30s linear infinite; }
+  .marquee:hover .marquee-track, .marquee:focus-within .marquee-track, .marquee[data-paused="true"] .marquee-track { animation-play-state: paused; }
+}
+
+/* Fixed film grain from the draft. Decorative only. */
+.grain {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 .no-scrollbar { scrollbar-width: none; }
@@ -49,19 +123,20 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .marquee-track { animation: none !important; width: auto; flex-wrap: wrap; justify-content: center; }
+  .marquee-track > [data-dup] { display: none; }
+  .marquee-pause { display: none; }
+  .bru-card-lift:hover, .bru-btn:hover:not(:disabled), .bru-btn:active:not(:disabled) { transform: none; }
 }
 
-/* Primary text is black. Unlayered on purpose: it must beat any theme default, including dark-mode white. */
-:root { --cc-text: #000000; }
-html, body, header, main, footer, h1, h2, h3, h4, h5, h6 { color: var(--cc-text); }
-
-/* Self-hosted Inter (Fontsource). Unlayered so it beats the AstraX neutral theme's Figtree
-   font tokens, which would otherwise be requested from a third-party host. */
+/* Text is black by default. Unlayered so it beats any theme default (incl. a dark-mode OS) but at zero
+   specificity and only on the roots, so headings inherit and Tailwind utilities (white on black blocks) still work. */
+:where(html, body) { color: #000; }
+/* AstraX tokens: self-hosted Space Grotesk instead of its Figtree default. Unlayered to beat the theme. */
 :root, body, body * {
-  --font-family-body: "Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-family-body: "Space Grotesk Variable", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-family-heading: var(--font-family-body);
 }

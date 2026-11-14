@@ -10,7 +10,7 @@ async function Body({ searchParams }: { searchParams: Promise<{ token?: string }
   const { token } = await searchParams;
   return (
     <AuthCard title="Choose a new password">
-      {token ? <ResetForm token={token} /> : <p className="text-sm text-cc-muted">This link is missing its token. <Link href="/forgot-password" className="text-cc-blue hover:underline">Request a new one</Link>.</p>}
+      {token ? <ResetForm token={token} /> : <p className="text-base font-bold">This link is missing its token. <Link href="/forgot-password" className="font-bold underline underline-offset-4 decoration-2 hover:bg-black hover:text-white">Request a new one</Link>.</p>}
     </AuthCard>
   );
 }

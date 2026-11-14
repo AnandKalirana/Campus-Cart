@@ -2,32 +2,27 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 const STEPS = [
-  { n: "01", title: "List in a minute", body: ["A few photos.", "A fair price."] },
-  { n: "02", title: "Meet your buyer", body: ["Chat with verified students."] },
-  { n: "03", title: "Pass it forward", body: ["Meet locally.", "Make their day."] },
+  { n: "01", title: "List it", color: "text-white" },
+  { n: "02", title: "Meet up", color: "text-cc-orange" },
+  { n: "03", title: "Cash out", color: "text-white" },
 ];
 
 export function SellPromo() {
   return (
-    <section aria-labelledby="promo-title" className="mx-auto mt-16 max-w-[1312px] px-5 lg:px-0">
-      <div className="grid gap-10 rounded-[28px] bg-cc-surface-blue px-6 py-10 sm:px-9 lg:grid-cols-[1fr_1.1fr] lg:gap-6 lg:py-9">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-cc-blue">Good for your wallet. Better for the planet.</p>
-          <h2 id="promo-title" className="mt-5 text-[32px] font-semibold leading-[1.15] tracking-[-0.03em]">Your old stuff.<br />Someone&rsquo;s new favorite.</h2>
-          <p className="mt-5 text-[15px] text-cc-muted">Make room for what&rsquo;s next. Listing is always free.</p>
-          <Link href="/sell" className="mt-6 inline-flex h-10 items-center gap-8 rounded-full bg-cc-ink px-5 text-[13px] font-medium text-white transition-[transform,background-color] duration-150 hover:bg-black active:scale-[0.97]">
-            Start selling <ArrowUpRight size={16} aria-hidden />
-          </Link>
-        </div>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-cc-muted">A second life, in three simple steps</p>
-          <ol className="mt-8 grid gap-8 sm:grid-cols-3">
+    <section aria-labelledby="promo-title" className="mx-auto mt-24 max-w-[1400px] px-5 lg:mt-32 lg:px-6">
+      <div className="on-dark relative overflow-hidden border-b-[14px] border-r-[14px] border-cc-red bg-black p-7 text-white sm:p-12 lg:p-16">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="space-y-8">
+            <h2 id="promo-title" className="font-raw text-[clamp(2.4rem,7vw,5.5rem)] italic leading-[0.9]">Your stuff. Their luck.</h2>
+            <p className="border-l-8 border-cc-red pl-5 text-xl font-bold sm:pl-8 sm:text-2xl">Empty your room before move-out. Get paid, keep it circular. Listing is always free.</p>
+            <div className="flex flex-wrap gap-5 pt-4">
+              <Link href="/sell" className="bru-btn h-14 bg-cc-red px-8 text-xl text-white hover:!bg-white hover:!text-black sm:text-2xl">Start selling <ArrowUpRight size={22} aria-hidden /></Link>
+              <Link href="/how-it-works" className="bru-btn h-14 bg-white px-8 text-xl text-black sm:text-2xl">How it works</Link>
+            </div>
+          </div>
+          <ol className="grid content-center gap-8 font-raw text-4xl sm:text-5xl">
             {STEPS.map(s => (
-              <li key={s.n}>
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-white text-xs font-medium text-cc-blue">{s.n}</span>
-                <h3 className="mt-5 text-[16px] font-semibold">{s.title}</h3>
-                <p className="mt-3 text-[13px] leading-[1.55] text-cc-muted">{s.body.map((l, i) => <span key={i} className="block">{l}</span>)}</p>
-              </li>
+              <li key={s.n} className={`flex items-center gap-5 ${s.color}`}><span className="text-6xl sm:text-7xl" aria-hidden>{s.n}</span>{s.title}</li>
             ))}
           </ol>
         </div>

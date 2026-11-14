@@ -6,16 +6,20 @@ export const NAV = [
   { href: "/marketplace", label: "Marketplace" },
   { href: "/how-it-works", label: "How it works" },
 ];
+export const ACCOUNT_NAV = { href: "/dashboard", label: "Dashboard" };
 
-export function NavLinks() {
+const base = "px-2 transition-colors";
+
+export function NavLinks({ signedIn = false }: { signedIn?: boolean }) {
   const pathname = usePathname();
+  const items = signedIn ? [NAV[0], ACCOUNT_NAV, NAV[1]] : NAV;
   return (
     <>
-      {NAV.map(n => {
+      {items.map(n => {
         const on = pathname === n.href || pathname.startsWith(n.href + "/");
         return (
           <Link key={n.href} href={n.href} aria-current={on ? "page" : undefined}
-            className={`text-[15px] transition-colors hover:text-cc-ink ${on ? "font-medium text-cc-ink" : "text-cc-muted"}`}>
+            className={on ? `${base} tilt-1 bg-black px-4 py-1 text-white` : `bru-link`}>
             {n.label}
           </Link>
         );
@@ -24,13 +28,11 @@ export function NavLinks() {
   );
 }
 
-/** Same links without active state, rendered in the static shell until the pathname is known. */
+/** Same links without active state, rendered in the static shell until the session and pathname are known. */
 export function NavLinksFallback() {
   return (
     <>
-      {NAV.map(n => (
-        <Link key={n.href} href={n.href} className="text-[15px] text-cc-muted transition-colors hover:text-cc-ink">{n.label}</Link>
-      ))}
+      {NAV.map(n => <Link key={n.href} href={n.href} className="bru-link">{n.label}</Link>)}
     </>
   );
 }

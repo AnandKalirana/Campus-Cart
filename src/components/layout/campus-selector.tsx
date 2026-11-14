@@ -44,23 +44,22 @@ export function CampusSelector() {
   return (
     <div ref={ref} className="relative">
       <button type="button" aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={() => setOpen(o => !o)}
-        className="flex h-10 items-center gap-2.5 rounded-full bg-cc-surface px-4 text-[13px] font-medium transition-colors hover:bg-[#eaecf1]">
-        <MapPin size={16} strokeWidth={1.75} className="text-cc-muted" aria-hidden />
-        <span className="max-w-[180px] truncate">{campus}</span>
-        <ChevronDown size={14} className="text-cc-muted" aria-hidden />
+        className="bru-btn h-12 w-full justify-start bg-white px-4 text-sm min-[1400px]:w-auto">
+        <MapPin size={18} aria-hidden />
+        <span title={campus} className="max-w-[110px] truncate 2xl:max-w-[170px]">{campus}</span>
+        <ChevronDown size={16} aria-hidden />
       </button>
       <AnimatePresence>
         {open && (
           <motion.ul id={listId} role="listbox" aria-label="Select your campus"
-            initial={{ opacity: 0, y: -4, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -2, scale: 0.98 }} transition={{ duration: 0.16, ease: [0.23, 1, 0.32, 1] }}
-            style={{ transformOrigin: "top left" }}
-            className="absolute left-0 top-12 z-50 w-72 rounded-2xl border border-cc-line bg-white p-1.5 shadow-[0_12px_32px_rgba(16,24,40,0.12)]">
+            initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -2 }} transition={{ duration: 0.1, ease: "easeOut" }}
+            className="bru-card absolute left-0 top-14 z-50 w-72 max-w-[calc(100vw-2.5rem)] p-1">
             {CAMPUSES.map(c => (
               <li key={c} role="option" aria-selected={c === campus}>
                 <button type="button" onClick={() => choose(c)}
-                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm hover:bg-cc-surface">
-                  {c}{c === campus && <Check size={16} className="text-cc-blue" aria-hidden />}
+                  className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm font-bold hover:bg-black hover:text-white">
+                  {c}{c === campus && <Check size={18} aria-hidden />}
                 </button>
               </li>
             ))}

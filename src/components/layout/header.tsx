@@ -4,27 +4,26 @@ import { Heart, MessageCircle, Plus } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { CampusSelector } from "./campus-selector";
 import { MobileMenu } from "./mobile-menu";
-import { NavLinks, NavLinksFallback } from "./nav-links";
-import { AccountMenu } from "./account-menu";
+import { NavLinksFallback } from "./nav-links";
+import { PrimaryNav } from "./primary-nav";
+import { AccountMenu, MobileAccountLinks } from "./account-menu";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-cc-line bg-white/90 backdrop-blur">
-      <div className="relative mx-auto flex h-[72px] max-w-[1312px] items-center gap-6 px-5 lg:h-[88px] lg:px-0">
+    <header className="sticky top-0 z-40 border-b-4 border-black bg-cc-paper">
+      <div className="relative mx-auto flex max-w-[1400px] items-center gap-6 px-5 py-3 lg:px-6 lg:py-5">
         <Logo />
-        <nav aria-label="Primary" className="ml-6 hidden items-center gap-10 lg:flex">
-          <Suspense fallback={<NavLinksFallback />}><NavLinks /></Suspense>
+        <nav aria-label="Primary" className="ml-2 hidden items-center gap-3 font-raw text-lg min-[1400px]:flex 2xl:ml-4 2xl:gap-5 2xl:text-xl">
+          <Suspense fallback={<NavLinksFallback />}><PrimaryNav /></Suspense>
         </nav>
-        <div className="ml-auto hidden items-center gap-5 lg:flex">
+        <div className="ml-auto hidden items-center gap-3 min-[1400px]:flex 2xl:gap-4">
           <CampusSelector />
-          <Link href="/wishlist" aria-label="Wishlist" className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-cc-surface"><Heart size={22} strokeWidth={1.5} /></Link>
-          <Link href="/messages" aria-label="Messages" className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-cc-surface"><MessageCircle size={22} strokeWidth={1.5} /></Link>
-          <Suspense fallback={<Link href="/login" className="text-[15px] font-medium">Log in</Link>}><AccountMenu /></Suspense>
-          <Link href="/sell" className="flex h-11 items-center gap-2.5 rounded-full bg-cc-ink px-6 text-[15px] font-medium text-white transition-[transform,background-color] duration-150 hover:bg-black active:scale-[0.97]">
-            <Plus size={18} aria-hidden /> Sell an item
-          </Link>
+          <Link href="/wishlist" aria-label="Wishlist" className="bru-btn h-12 w-12 bg-white"><Heart size={22} aria-hidden /></Link>
+          <Link href="/messages" aria-label="Messages" className="bru-btn h-12 w-12 bg-white"><MessageCircle size={22} aria-hidden /></Link>
+          <Suspense fallback={<Link href="/login" className="bru-btn h-12 bg-white px-5 text-lg">Log in</Link>}><AccountMenu /></Suspense>
+          <Link href="/sell" className="bru-btn tilt-2 h-12 bg-cc-orange px-6 text-xl text-black"><Plus size={20} aria-hidden /> Sell now</Link>
         </div>
-        <MobileMenu />
+        <MobileMenu account={<Suspense fallback={<Link href="/login" className="block border-b-4 border-black py-3.5 font-raw text-xl">Log in</Link>}><MobileAccountLinks /></Suspense>} />
       </div>
     </header>
   );
