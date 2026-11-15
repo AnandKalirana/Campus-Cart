@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk npm *)",
+      "Bash(npm run *)",
+      "Bash(rtk lint *)",
+      "Bash(rtk read *)",
+      "Bash(findstr \"dashboard-service\" -C 20)",
+      "Bash(python3 -c ' *)",
+      "Bash(npx eslint *)",
+      "Bash(node -e ' *)",
+      "Read(//tmp/**)",
+      "Bash(rtk git *)"
+    ]
+  }
+}

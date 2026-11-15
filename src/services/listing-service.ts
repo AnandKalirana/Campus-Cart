@@ -7,6 +7,8 @@ import { getStore } from "@/lib/storage";
 import { processImage } from "@/lib/images";
 import { randomUUID } from "node:crypto";
 
+export type { ListingCardData } from "@/lib/listing-format";
+
 export interface Actor { id: string; role: "STUDENT" | "ADMIN"; emailVerified: boolean; universityId: string | null }
 
 export type ServiceResult<T> = { ok: true; value: T } | { ok: false; code: "forbidden" | "not_found" | "invalid" | "limit" | "conflict"; message: string; field?: string };

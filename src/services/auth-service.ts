@@ -108,3 +108,14 @@ export async function resetPassword(token: string, newPassword: string): Promise
   ]);
   return true;
 }
+
+export async function resendVerificationEmail(userId: string): Promise<void> {
+  const user = await db().user.findUnique({ where: { id: userId }, select: { email: true, emailVerified: true } });
+  if (!user || user.emailVerified) return;
+  const token = await issueToken(userId, "EMAIL_VERIFY", VERIFY_TTL_MS);
+  await sendMail({
+    to: user.email,
+    subject: "Verify your Campus Cart email",
+    text: `Welcome to Campus Cart.\n\nVerify your email: ${env().APP_URL}/verify-email?token=${token}\n\nThis link expires in 24 hours. If you didn't sign up, ignore this email.`,
+  });
+}

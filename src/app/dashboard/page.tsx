@@ -7,6 +7,7 @@ import { StatCards } from "@/components/dashboard/stat-cards";
 import { ListingsPanel } from "@/components/dashboard/listings-panel";
 import { InboxAndPickup } from "@/components/dashboard/inbox-and-pickup";
 import { SavedAndPromo } from "@/components/dashboard/saved-and-promo";
+import { getDashboardData } from "@/services/dashboard-service";
 
 export const metadata: Metadata = { title: "Your dashboard", robots: { index: false } };
 
@@ -14,6 +15,8 @@ export const metadata: Metadata = { title: "Your dashboard", robots: { index: fa
 async function Body() {
   const user = await requireUser("/dashboard");
   const first = user.name.trim().split(/\s+/)[0] || "you";
+  const data = await getDashboardData();
+
   return (
     <div className="mx-auto max-w-[1440px] px-4 pb-8 pt-8 md:px-6 md:pt-14 lg:pt-16">
       <div className="mb-8 flex flex-col gap-6 md:mb-12 md:flex-row md:items-end md:justify-between md:gap-8">
@@ -26,16 +29,13 @@ async function Body() {
         </div>
         <Link href="/marketplace" className="bru-btn tilt-2 min-h-12 w-full bg-white px-6 py-3 text-base md:h-16 md:w-auto md:px-10 md:text-xl">Browse marketplace</Link>
       </div>
-      <p role="status" className="mb-10 border-4 border-black bg-cc-yellow px-4 py-3 font-bold">
-        Sample data{" // "}the numbers, listings and messages below are placeholders. Your real activity shows up here once listings and messaging go live.
-      </p>
       <DashboardTabs />
-      <StatCards />
+      <StatCards stats={data.stats} />
       <div className="mb-12 grid grid-cols-[minmax(0,1fr)] gap-10 md:mb-20 lg:grid-cols-3 lg:gap-16">
-        <ListingsPanel />
-        <InboxAndPickup />
+        <ListingsPanel listings={data.listings} />
+        <InboxAndPickup conversations={data.listings} />
       </div>
-      <SavedAndPromo />
+      <SavedAndPromo stats={data.stats} />
     </div>
   );
 }
