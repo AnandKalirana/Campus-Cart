@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import "./globals.css"; // first: declares the cascade-layer order
 import type { Metadata } from "next";
 import { Theme } from "@astryxdesign/core/theme";
@@ -23,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </a>
           <Providers>
             <div aria-hidden className="grain" />
-            <Marquee />
+            <Suspense fallback={<div className="h-10 border-b-4 border-black bg-black" aria-hidden />}><Marquee /></Suspense>
             <Header />
             <main id="main">{children}</main>
             <Footer />

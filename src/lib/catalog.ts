@@ -40,3 +40,12 @@ export const CAMPUSES = ["University of Washington", "IIT Bombay", "TCET Mumbai"
 export const CAMPUS_SHORT: Record<(typeof CAMPUSES)[number], string> = {
   "University of Washington": "UW", "IIT Bombay": "IITB", "TCET Mumbai": "TCET", "University of Mumbai": "MU", "VJTI Mumbai": "VJTI",
 };
+
+import type { ListingCardData } from "@/lib/listing-format";
+const DEMO_COND = { "Like new": "LIKE_NEW", Good: "GOOD", Used: "USED" } as const;
+/** Adapts sample data to the real card shape. Used only while the database has no live listings. */
+export const demoCards = (): ListingCardData[] => DEMO_PRODUCTS.map(d => ({
+  id: d.id, title: d.title, description: d.description, categorySlug: d.categorySlug, categoryName: d.categoryLabel,
+  condition: DEMO_COND[d.condition], price: d.price, originalPrice: d.originalPrice, campusName: "Sample campus",
+  image: d.image, imageAlt: d.imageAlt, status: "ACTIVE",
+}));

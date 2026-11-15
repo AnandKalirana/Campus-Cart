@@ -44,3 +44,4 @@ next-env.d.ts
 # generated Prisma client (rebuilt by postinstall)
 /src/generated/
 .neon
+.data/
