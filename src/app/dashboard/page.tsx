@@ -7,6 +7,7 @@ import { StatCards } from "@/components/dashboard/stat-cards";
 import { ListingsPanel } from "@/components/dashboard/listings-panel";
 import { InboxAndPickup } from "@/components/dashboard/inbox-and-pickup";
 import { SavedAndPromo } from "@/components/dashboard/saved-and-promo";
+import { PurchaseRequestsPanel } from "@/components/dashboard/purchase-requests-panel";
 import { getDashboardData } from "@/services/dashboard-service";
 
 export const metadata: Metadata = { title: "Your dashboard", robots: { index: false } };
@@ -35,6 +36,7 @@ async function Body() {
         <ListingsPanel listings={data.listings} />
         <InboxAndPickup conversations={data.listings} />
       </div>
+      <PurchaseRequestsPanel buyerRequests={data.purchaseRequests.buyer} sellerRequests={data.purchaseRequests.seller} />
       <SavedAndPromo stats={data.stats} />
     </div>
   );

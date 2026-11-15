@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/lib/session";
 import { idSchema } from "@/lib/validation/listing";
 import { getListingForViewer } from "@/services/listing-service";
 import { ComingSoon } from "@/components/ui/coming-soon";
+import { PurchaseRequestButton } from "@/components/purchase-request/purchase-request-button";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -71,7 +72,7 @@ async function Listing({ params }: Props) {
             {isOwner ? (
               <Link href={`/sell/${p.id}/edit`} className="bru-btn h-14 bg-cc-orange px-8 text-xl">Edit listing</Link>
             ) : sold ? null : user ? (
-              <p className="bru-card p-4 text-base font-bold">Messaging and purchase requests arrive in the next update. Nothing to do here yet.</p>
+              <PurchaseRequestButton productId={p.id} productTitle={p.title} productPrice={p.price} />
             ) : (
               <Link href={`/login?next=${next}`} className="bru-btn h-14 bg-black px-8 text-xl text-white">Log in to contact seller</Link>
             )}

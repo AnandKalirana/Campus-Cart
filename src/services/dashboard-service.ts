@@ -3,7 +3,9 @@
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { listOwnListings } from "@/services/listing-service";
+import { getPurchaseRequests } from "@/services/purchase-request-service";
 import { ListingCardData } from "@/services/listing-service";
+import type { PurchaseRequestWithDetails } from "@/services/purchase-request-service";
 
 export interface DashboardStats {
   activeListings: number;
@@ -12,6 +14,7 @@ export interface DashboardStats {
   totalEarned: number;
   unreadMessages: number;
   savedItems: number;
+  pendingRequests: number;
 }
 
 export interface DashboardData {
@@ -21,15 +24,21 @@ export interface DashboardData {
     draft: ListingCardData[];
     sold: ListingCardData[];
   };
+  purchaseRequests: {
+    buyer: PurchaseRequestWithDetails[];
+    seller: PurchaseRequestWithDetails[];
+  };
 }
 
 /** Fetch all dashboard data for the current user in parallel */
 export async function getDashboardData(): Promise<DashboardData> {
   const user = await requireUser("/dashboard");
 
-  const [myListings, stats] = await Promise.all([
+  const [myListings, stats, buyerRequests, sellerRequests] = await Promise.all([
     listOwnListings(user.id),
     getDashboardStats(user.id),
+    getPurchaseRequests("buyer"),
+    getPurchaseRequests("seller"),
   ]);
 
   return {
@@ -38,6 +47,10 @@ export async function getDashboardData(): Promise<DashboardData> {
       active: myListings.filter(l => l.status === "ACTIVE"),
       draft: myListings.filter(l => l.status === "PAUSED"),
       sold: myListings.filter(l => l.status === "SOLD"),
+    },
+    purchaseRequests: {
+      buyer: buyerRequests,
+      seller: sellerRequests,
     },
   };
 }
@@ -51,6 +64,7 @@ async function getDashboardStats(userId: string): Promise<DashboardStats> {
     earnedAgg,
     unreadCount,
     savedCount,
+    pendingRequests,
   ] = await Promise.all([
     db().product.count({ where: { sellerId: userId, status: "ACTIVE" } }),
     db().product.count({ where: { sellerId: userId, status: "PAUSED" } }),
@@ -67,6 +81,12 @@ async function getDashboardStats(userId: string): Promise<DashboardStats> {
       },
     }),
     db().wishlist.count({ where: { userId } }),
+    db().purchaseRequest.count({
+      where: {
+        product: { sellerId: userId },
+        status: "PENDING",
+      },
+    }),
   ]);
 
   return {
@@ -76,6 +96,7 @@ async function getDashboardStats(userId: string): Promise<DashboardStats> {
     totalEarned: earnedAgg._sum.price ?? 0,
     unreadMessages: unreadCount,
     savedItems: savedCount,
+    pendingRequests,
   };
 }
 

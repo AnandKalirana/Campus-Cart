@@ -10,7 +10,8 @@
       "Bash(npx eslint *)",
       "Bash(node -e ' *)",
       "Read(//tmp/**)",
-      "Bash(rtk git *)"
+      "Bash(rtk git *)",
+      "Bash(npm test *)"
     ]
   }
 }

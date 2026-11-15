@@ -11,6 +11,7 @@ interface StatCardsProps {
 export function StatCards({ stats }: StatCardsProps) {
   const cards = [
     { label: "Active listings", value: pad(stats.activeListings), note: <Resp mobile="In play" desktop="Getting attention" />, chip: "bg-cc-yellow", card: "tilt-1" },
+    { label: "Pending offers", value: pad(stats.pendingRequests), note: <Resp mobile="Waiting" desktop="Awaiting your reply" />, chip: "bg-cc-orange", card: "tilt-3" },
     { label: "Unread msgs", value: pad(stats.unreadMessages), note: <Resp mobile="New talk" desktop={`${stats.unreadMessages} unread`} />, chip: "bg-cc-sky", card: "bg-[#dbeafe]" },
     { label: "Total earned", value: formatINR(stats.totalEarned), note: <Resp mobile="All time" desktop="All time" />, chip: "bg-cc-green", card: "tilt-2" },
     { label: "Saved finds", value: pad(stats.savedItems), note: <Resp mobile="Must-haves" desktop="Campus must-haves" />, chip: "bg-cc-pink", card: "" },
