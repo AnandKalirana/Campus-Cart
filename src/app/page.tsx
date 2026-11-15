@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Hero } from "@/components/marketplace/hero";
 import { CategoryRail } from "@/components/marketplace/category-rail";
 import { FreshFinds } from "@/components/marketplace/fresh-finds";
@@ -9,7 +10,9 @@ export default function HomePage() {
     <>
       <Hero />
       <CategoryRail />
-      <FreshFinds />
+      <Suspense fallback={<div className="mx-auto mt-20 h-96 max-w-[1400px] px-5" aria-busy="true" />}>
+        <FreshFinds />
+      </Suspense>
       <SellPromo />
     </>
   );
