@@ -1,0 +1,239 @@
+"use server";
+
+import { db } from "@/lib/db";
+import { requireUser } from "@/lib/session";
+import type { Actor } from "@/services/listing-service";
+import { getListingForViewer } from "@/services/listing-service";
+
+export interface ConversationWithDetails {
+  id: string;
+  productId: string;
+  productTitle: string;
+  productPrice: number;
+  productImage: string | null;
+  otherPartyId: string;
+  otherPartyName: string;
+  lastMessage: string | null;
+  lastMessageTime: Date;
+  lastMessageSenderId: string | null;
+  unreadCount: number;
+  isBuyer: boolean;
+  updatedAt: Date;
+}
+
+export interface MessageWithSender {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  senderName: string;
+  body: string;
+  readAt: Date | null;
+  createdAt: Date;
+  isOwn: boolean;
+}
+
+export type SendMessageResult =
+  | { ok: true; message: MessageWithSender; conversationId: string }
+  | { ok: false; code: "forbidden" | "not_found" | "invalid"; message: string };
+
+/** Get all conversations for the current user (as buyer or seller) */
+export async function getConversations(): Promise<ConversationWithDetails[]> {
+  const user = await requireUser("/messages");
+
+  const conversations = await db().conversation.findMany({
+    where: {
+      OR: [{ buyerId: user.id }, { sellerId: user.id }],
+    },
+    orderBy: { updatedAt: "desc" },
+    include: {
+      product: {
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          images: { orderBy: { position: "asc" }, take: 1, select: { url: true } },
+        },
+      },
+      buyer: { select: { id: true, name: true } },
+      seller: { select: { id: true, name: true } },
+      messages: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { id: true, body: true, senderId: true, readAt: true, createdAt: true },
+      },
+      _count: {
+        select: { messages: { where: { readAt: null, senderId: { not: user.id } } } },
+      },
+    },
+  });
+
+  return conversations.map(c => {
+    const isBuyer = c.buyerId === user.id;
+    const other = isBuyer ? c.seller : c.buyer;
+    const lastMsg = c.messages[0];
+    return {
+      id: c.id,
+      productId: c.product.id,
+      productTitle: c.product.title,
+      productPrice: c.product.price,
+      productImage: c.product.images[0]?.url ?? null,
+      otherPartyId: other.id,
+      otherPartyName: other.name.split(" ")[0],
+      lastMessage: lastMsg?.body ?? null,
+      lastMessageTime: lastMsg?.createdAt ?? c.createdAt,
+      lastMessageSenderId: lastMsg?.senderId ?? null,
+      unreadCount: c._count.messages,
+      isBuyer,
+      updatedAt: c.updatedAt,
+    };
+  });
+}
+
+/** Get messages for a conversation (paginated, newest first) */
+export async function getMessages(conversationId: string, cursor?: string, limit = 50): Promise<{ messages: MessageWithSender[]; nextCursor: string | null }> {
+  const user = await requireUser("/messages");
+
+  const conversation = await db().conversation.findUnique({
+    where: { id: conversationId },
+    select: { buyerId: true, sellerId: true },
+  });
+  if (!conversation || (conversation.buyerId !== user.id && conversation.sellerId !== user.id)) {
+    throw new Error("Not found");
+  }
+
+  const messages = await db().message.findMany({
+    where: {
+      conversationId,
+      ...(cursor && { createdAt: { lt: new Date(cursor) } }),
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit + 1,
+    include: { sender: { select: { id: true, name: true } } },
+  });
+
+  const hasMore = messages.length > limit;
+  const items = hasMore ? messages.slice(0, limit) : messages;
+  const nextCursor = hasMore ? items[items.length - 1].createdAt.toISOString() : null;
+
+  return {
+    messages: items.map(m => ({
+      id: m.id,
+      conversationId: m.conversationId,
+      senderId: m.senderId,
+      senderName: m.sender.name.split(" ")[0],
+      body: m.body,
+      readAt: m.readAt,
+      createdAt: m.createdAt,
+      isOwn: m.senderId === user.id,
+    })).reverse(),
+    nextCursor,
+  };
+}
+
+/** Send a message in a conversation (creates conversation if first message from buyer) */
+export async function sendMessage(
+  actor: Actor,
+  productId: string,
+  body: string
+): Promise<SendMessageResult> {
+  const trimmed = body.trim();
+  if (!trimmed || trimmed.length > 2000) {
+    return { ok: false, code: "invalid", message: "Message must be 1-2000 characters" };
+  }
+
+  const listing = await getListingForViewer(productId, actor);
+  if (!listing) {
+    return { ok: false, code: "not_found", message: "Listing not found" };
+  }
+  const { listing: product, isOwner } = listing;
+
+  if (product.status === "SOLD" || product.status === "REMOVED") {
+    return { ok: false, code: "forbidden", message: "Cannot message on this listing" };
+  }
+
+  if (isOwner) {
+    return { ok: false, code: "forbidden", message: "Cannot message yourself" };
+  }
+
+  const conversation = await db().$transaction(async tx => {
+    let convo = await tx.conversation.findUnique({
+      where: { productId_buyerId: { productId, buyerId: actor.id } },
+    });
+
+    if (!convo) {
+      convo = await tx.conversation.create({
+        data: {
+          productId,
+          buyerId: actor.id,
+          sellerId: product.sellerId,
+        },
+      });
+    }
+
+    const message = await tx.message.create({
+      data: {
+        conversationId: convo.id,
+        senderId: actor.id,
+        body: trimmed,
+      },
+    });
+
+    await tx.conversation.update({
+      where: { id: convo.id },
+      data: { updatedAt: new Date() },
+    });
+
+    return { conversation: convo, message };
+  });
+
+  const msg = conversation.message;
+  return {
+    ok: true,
+    conversationId: conversation.conversation.id,
+    message: {
+      id: msg.id,
+      conversationId: msg.conversationId,
+      senderId: msg.senderId,
+      senderName: actor.name.split(" ")[0],
+      body: msg.body,
+      readAt: msg.readAt,
+      createdAt: msg.createdAt,
+      isOwn: true,
+    },
+  };
+}
+
+/** Mark messages as read up to a certain message (or all) */
+export async function markMessagesRead(conversationId: string, messageId?: string): Promise<void> {
+  const user = await requireUser("/messages");
+
+  const conversation = await db().conversation.findUnique({
+    where: { id: conversationId },
+    select: { buyerId: true, sellerId: true },
+  });
+  if (!conversation || (conversation.buyerId !== user.id && conversation.sellerId !== user.id)) {
+    return;
+  }
+
+  await db().message.updateMany({
+    where: {
+      conversationId,
+      senderId: { not: user.id },
+      readAt: null,
+      ...(messageId && { id: { lte: messageId } }),
+    },
+    data: { readAt: new Date() },
+  });
+}
+
+/** Get unread message count for the current user */
+export async function getUnreadCount(): Promise<number> {
+  const user = await requireUser("/messages");
+  return db().message.count({
+    where: {
+      conversation: { OR: [{ buyerId: user.id }, { sellerId: user.id }] },
+      senderId: { not: user.id },
+      readAt: null,
+    },
+  });
+}

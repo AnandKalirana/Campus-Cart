@@ -34,7 +34,7 @@ before(async () => {
   await db().category.create({ data: { slug: `lap-${tag}`, name: `Laptops ${tag}`, blurb: "b", icon: "Laptop" } });
   const mk = async (n: string, uni: string | null, verified: boolean) => {
     const u = await db().user.create({ data: { email: `${tag}-${n}@campus.test`, name: `User ${n}`, universityId: uni, emailVerified: verified ? new Date() : null } });
-    return { id: u.id, role: "STUDENT" as const, emailVerified: verified, universityId: uni };
+    return { id: u.id, name: `User ${n}`, role: "STUDENT" as const, emailVerified: verified, universityId: uni };
   };
   A = await mk("a", uniA, true); B = await mk("b", uniB, true); UNVERIFIED = await mk("u", uniA, false); NOCAMPUS = await mk("n", null, true);
 });
@@ -187,7 +187,7 @@ test("search: text, category, campus, condition, price range, sort, pagination; 
 
 test("abuse guard: open-listing cap", run, async () => {
   const c = await db().user.create({ data: { email: `${tag}-cap@campus.test`, name: "Cap", universityId: uniA, emailVerified: new Date() } });
-  const actor = { id: c.id, role: "STUDENT" as const, emailVerified: true, universityId: uniA };
+  const actor = { id: c.id, name: "Cap", role: "STUDENT" as const, emailVerified: true, universityId: uniA };
   await db().product.createMany({ data: Array.from({ length: svc.MAX_OPEN_LISTINGS }, (_, i) => ({ sellerId: c.id, universityId: uniA, categoryId: catBooks, title: `Cap ${i}`, description: "filler filler", price: 1, condition: "GOOD" as const, pickupLocation: "x", status: "PAUSED" as const })) });
   const r = await svc.createListing(actor, input());
   assert.deepEqual([r.ok, !r.ok && r.code], [false, "limit"]);
