@@ -11,8 +11,8 @@ async function Body() {
   // Only campuses that have verification domains configured can accept sign-ups.
   const campuses = await db().university.findMany({ where: { isActive: true, NOT: { emailDomains: { isEmpty: true } } }, select: { id: true, name: true }, orderBy: { name: "asc" } });
   return (
-    <AuthCard title="Join your campus" subtitle="Students only. We verify your college email." footer={<>Already have an account? <Link href="/login" className="font-medium text-cc-blue hover:underline">Log in</Link></>}>
-      {campuses.length ? <RegisterForm campuses={campuses} /> : <p className="rounded-xl bg-white p-4 text-sm text-cc-muted">No campuses are accepting sign-ups yet. An admin needs to add institutional email domains first.</p>}
+    <AuthCard title="Join your campus" subtitle="Students only. We verify your college email." footer={<>Already have an account? <Link href="/login" className="font-bold underline underline-offset-4 decoration-2 hover:bg-black hover:text-white">Log in</Link></>}>
+      {campuses.length ? <RegisterForm campuses={campuses} /> : <p className="bru-card p-4 text-base font-bold">No campuses are accepting sign-ups yet. An admin needs to add institutional email domains first.</p>}
     </AuthCard>
   );
 }

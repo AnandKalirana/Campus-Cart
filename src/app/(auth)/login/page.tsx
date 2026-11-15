@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Log in" };
 async function Body({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;
   return (
-    <AuthCard title="Welcome back" subtitle="Log in with your college email." footer={<>New here? <Link href="/register" className="font-medium text-cc-blue hover:underline">Create an account</Link></>}>
+    <AuthCard title="Welcome back" subtitle="Log in with your college email." footer={<>New here? <Link href="/register" className="font-bold underline underline-offset-4 decoration-2 hover:bg-black hover:text-white">Create an account</Link></>}>
       <LoginForm next={safeNextPath(next)} />
     </AuthCard>
   );

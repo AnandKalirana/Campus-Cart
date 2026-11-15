@@ -1,11 +1,11 @@
 export function AuthCard({ title, subtitle, children, footer }: { title: string; subtitle?: string; children: React.ReactNode; footer?: React.ReactNode }) {
   return (
-    <section className="mx-auto flex max-w-[1312px] justify-center px-5 py-14 lg:px-0 lg:py-20">
-      <div className="w-full max-w-[440px] rounded-[28px] bg-cc-surface p-7 sm:p-9">
-        <h1 className="text-[28px] font-semibold tracking-[-0.03em]">{title}</h1>
-        {subtitle && <p className="mt-2 text-[15px] text-cc-muted">{subtitle}</p>}
+    <section className="mx-auto flex max-w-[1400px] justify-center px-5 py-12 lg:px-6 lg:py-20">
+      <div className="bru-card w-full max-w-[480px] p-6 sm:p-9">
+        <h1 className="font-raw text-[clamp(2rem,6vw,2.75rem)] leading-[0.95]">{title}</h1>
+        {subtitle && <p className="mt-3 text-lg font-bold">{subtitle}</p>}
         <div className="mt-7">{children}</div>
-        {footer && <div className="mt-6 border-t border-cc-line pt-5 text-center text-sm text-cc-muted">{footer}</div>}
+        {footer && <div className="mt-7 border-t-4 border-black pt-5 text-center text-base font-bold">{footer}</div>}
       </div>
     </section>
   );
