@@ -13,7 +13,9 @@ interface PurchaseRequestsPanelProps {
 }
 
 export function PurchaseRequestsPanel({ buyerRequests, sellerRequests }: PurchaseRequestsPanelProps) {
-  const [view, setView] = useState<"buyer" | "seller">("buyer");
+  // Sellers land on the offers they need to answer; otherwise show whichever side has something.
+  const pendingForMe = sellerRequests.filter(r => r.status === "PENDING").length;
+  const [view, setView] = useState<"buyer" | "seller">(() => (pendingForMe > 0 || (buyerRequests.length === 0 && sellerRequests.length > 0) ? "seller" : "buyer"));
   const [selectedRequest, setSelectedRequest] = useState<PurchaseRequestWithDetails | null>(null);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
@@ -91,7 +93,7 @@ export function PurchaseRequestsPanel({ buyerRequests, sellerRequests }: Purchas
             onClick={() => setView("seller")}
             className={`px-3 py-2 text-[11px] font-bold uppercase transition-colors md:px-4 md:text-xs ${!isBuyerView ? "bg-black text-white" : "border-2 border-black bg-white hover:bg-cc-yellow"}`}
           >
-            Offers on my items ({sellerRequests.length})
+            Offers on my items ({sellerRequests.length}{pendingForMe > 0 ? `, ${pendingForMe} pending` : ""})
           </button>
         </div>
       </div>
@@ -162,42 +164,24 @@ export function PurchaseRequestsPanel({ buyerRequests, sellerRequests }: Purchas
                   {loadingAction === selectedRequest.id ? <Loader2 size={20} className="animate-spin" aria-hidden /> : "Cancel offer"}
                 </button>
               )}
-              {selectedRequest.status === "ACCEPTED" && (
-                <>
-                  {isBuyerView && (
-                    <button
-                      type="button"
-                      className="bru-btn h-12 flex-1 bg-black px-4 text-white"
-                      onClick={() => handleAction(selectedRequest.id, "COMPLETED")}
-                      disabled={loadingAction === selectedRequest.id}
-                    >
-                      {loadingAction === selectedRequest.id ? <Loader2 size={20} className="animate-spin" aria-hidden /> : "Mark complete"}
-                    </button>
-                  )}
-                  {!isBuyerView && selectedRequest.buyerConfirmedAt && (
-                    <button
-                      type="button"
-                      className="bru-btn h-12 flex-1 bg-black px-4 text-white"
-                      onClick={() => handleAction(selectedRequest.id, "COMPLETED")}
-                      disabled={loadingAction === selectedRequest.id}
-                    >
-                      {loadingAction === selectedRequest.id ? <Loader2 size={20} className="animate-spin" aria-hidden /> : "Mark complete"}
-                    </button>
-                  )}
-                  {!isBuyerView && !selectedRequest.buyerConfirmedAt && (
-                    <Link href={`/messages?product=${selectedRequest.productId}`} className="bru-btn h-12 flex-1 bg-cc-orange px-4 text-white flex items-center justify-center gap-2">
+              {selectedRequest.status === "ACCEPTED" && (() => {
+                const mine = isBuyerView ? selectedRequest.buyerConfirmedAt : selectedRequest.sellerMarkedSoldAt;
+                return (
+                  <>
+                    {mine ? (
+                      <span className="flex h-12 flex-1 items-center justify-center border-2 border-black bg-white px-3 text-center text-sm font-bold">You confirmed. Waiting for the {isBuyerView ? "seller" : "buyer"}.</span>
+                    ) : (
+                      <button type="button" className="bru-btn h-12 flex-1 bg-black px-4 text-white" onClick={() => handleAction(selectedRequest.id, "COMPLETED")} disabled={loadingAction === selectedRequest.id}>
+                        {loadingAction === selectedRequest.id ? <Loader2 size={20} className="animate-spin" aria-hidden /> : isBuyerView ? "I got it" : "I handed it over"}
+                      </button>
+                    )}
+                    <Link href={`/messages?product=${selectedRequest.productId}`} className="bru-btn flex h-12 flex-1 items-center justify-center gap-2 bg-cc-orange px-4 text-black">
                       <MessageSquare size={20} aria-hidden />
-                      Message buyer
+                      {isBuyerView ? "Message seller" : "Message buyer"}
                     </Link>
-                  )}
-                  {isBuyerView && !selectedRequest.sellerMarkedSoldAt && (
-                    <Link href={`/messages?product=${selectedRequest.productId}`} className="bru-btn h-12 flex-1 bg-cc-orange px-4 text-white flex items-center justify-center gap-2">
-                      <MessageSquare size={20} aria-hidden />
-                      Message seller
-                    </Link>
-                  )}
-                </>
-              )}
+                  </>
+                );
+              })()}
               {selectedRequest.status === "COMPLETED" && (
                 <span className="bru-btn h-12 flex-1 bg-[#1d4ed8] px-4 text-white flex items-center justify-center gap-2 cursor-default">
                   <Package size={20} aria-hidden />
@@ -230,7 +214,7 @@ export function PurchaseRequestsPanel({ buyerRequests, sellerRequests }: Purchas
             <li key={r.id} className="bru-card p-4 hover:bg-[#fef9c3] transition-colors cursor-pointer" onClick={() => setSelectedRequest(r)}>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex items-start gap-4 min-w-0 flex-1">
-                  <div className="h-16 w-16 flex-shrink-0 border-2 border-black bg-cc-sky overflow-hidden">
+                  <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden border-2 border-black bg-cc-sky">
                     {r.productImage ? (
                       <Image src={r.productImage} alt="" fill sizes="64px" className="object-cover" />
                     ) : (
@@ -241,7 +225,7 @@ export function PurchaseRequestsPanel({ buyerRequests, sellerRequests }: Purchas
                     <Link href={`/products/${r.productId}`} className="font-raw text-lg leading-tight hover:underline truncate block">{r.productTitle}</Link>
                     <p className="mt-1 text-sm font-bold text-cc-muted">{formatINR(r.productPrice)}</p>
                     <p className="mt-1 text-xs font-bold text-cc-muted">
-                      {isBuyerView ? `To ${r.buyerName}` : `From ${r.buyerName}`}
+                      {isBuyerView ? `To ${r.sellerName}` : `From ${r.buyerName}`}
                     </p>
                   </div>
                 </div>

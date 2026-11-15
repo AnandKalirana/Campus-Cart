@@ -157,7 +157,7 @@ export function ConversationThread({ initialConversation, initialMessages, nextC
             data-message-id={msg.id}
           >
             {!msg.isOwn && (
-              <div className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full border-2 border-black bg-cc-sky font-raw text-sm">
+              <div className="relative grid h-8 w-8 flex-shrink-0 place-items-center overflow-hidden rounded-full border-2 border-black bg-cc-sky font-raw text-sm">
                 {conversation.productImage ? (
                   <Image src={conversation.productImage} alt="" fill sizes="32px" className="rounded-full object-cover" />
                 ) : (

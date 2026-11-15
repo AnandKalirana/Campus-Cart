@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/session";
@@ -28,17 +28,19 @@ export interface DashboardData {
     buyer: PurchaseRequestWithDetails[];
     seller: PurchaseRequestWithDetails[];
   };
+  conversations: Awaited<ReturnType<typeof getRecentConversations>>;
 }
 
 /** Fetch all dashboard data for the current user in parallel */
 export async function getDashboardData(): Promise<DashboardData> {
   const user = await requireUser("/dashboard");
 
-  const [myListings, stats, buyerRequests, sellerRequests] = await Promise.all([
+  const [myListings, stats, buyerRequests, sellerRequests, conversations] = await Promise.all([
     listOwnListings(user.id),
     getDashboardStats(user.id),
     getPurchaseRequests("buyer"),
     getPurchaseRequests("seller"),
+    getRecentConversations(3),
   ]);
 
   return {
@@ -52,6 +54,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       buyer: buyerRequests,
       seller: sellerRequests,
     },
+    conversations,
   };
 }
 
@@ -75,7 +78,7 @@ async function getDashboardStats(userId: string): Promise<DashboardStats> {
     }),
     db().message.count({
       where: {
-        conversation: { buyerId: userId },
+        conversation: { OR: [{ buyerId: userId }, { sellerId: userId }] }, // as buyer OR seller
         readAt: null,
         senderId: { not: userId },
       },

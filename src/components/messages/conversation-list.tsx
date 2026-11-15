@@ -54,7 +54,7 @@ export function ConversationList({ initialConversations }: ConversationListProps
               className="bru-card-lift flex gap-4 p-4 hover:bg-[#fef9c3] transition-colors"
               aria-current={c.unreadCount > 0 ? "true" : undefined}
             >
-              <div className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-full border-2 border-black bg-cc-sky font-raw text-lg">
+              <div className="relative grid h-12 w-12 flex-shrink-0 place-items-center overflow-hidden rounded-full border-2 border-black bg-cc-sky font-raw text-lg">
                 {c.productImage ? (
                   <Image src={c.productImage} alt="" fill sizes="48px" className="rounded-full object-cover" />
                 ) : (

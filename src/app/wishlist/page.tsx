@@ -35,7 +35,7 @@ async function SavedItems() {
             <li key={item.id}>
               <Link href={`/products/${item.id}`} className="bru-card bru-card-lift group block overflow-hidden">
                 <div className="relative h-48 border-b-4 border-black bg-white md:h-56">
-                  <Image src={item.image ?? "/images/demo/laptop.svg"} alt={item.imageAlt} fill sizes="(min-width:1024px) 25vw, 100vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  {item.image ? <Image src={item.image} alt={item.imageAlt} fill sizes="(min-width:1024px) 25vw, 100vw" className="object-cover group-hover:scale-105 transition-transform duration-300" /> : <span role="img" aria-label="No photo" className="font-raw absolute inset-0 grid place-items-center">NO_PIC</span>}
                   <span className="font-raw absolute left-3 top-3 border-2 border-black bg-white px-2 py-0.5 text-[10px]">{item.condition}</span>
                   <span role="img" aria-label="Saved" className="absolute right-3 top-3 grid h-10 w-10 place-items-center border-2 border-black bg-cc-red text-white"><Heart size={20} fill="currentColor" aria-hidden /></span>
                 </div>

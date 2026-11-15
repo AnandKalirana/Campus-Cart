@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    // Listing photos are already re-encoded to WebP (max 1600px) by our upload pipeline and are served from /api/images,
+    // which needs the visitor's session for non-public listings. The optimizer fetches without cookies, so skip it.
+    unoptimized: true,
     // Demo stand-in art is SVG served from /public. Sandboxed so scripts can't run.
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",

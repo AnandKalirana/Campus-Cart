@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/session";
@@ -14,6 +14,7 @@ export interface PurchaseRequestWithDetails {
   productStatus: string;
   buyerId: string;
   buyerName: string;
+  sellerName: string;
   status: "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED" | "COMPLETED";
   note: string | null;
   sellerMarkedSoldAt: Date | null;
@@ -79,6 +80,7 @@ export async function createPurchaseRequest(
           price: true,
           status: true,
           images: { orderBy: { position: "asc" }, take: 1, select: { url: true } },
+          seller: { select: { id: true, name: true } },
         },
       },
       buyer: { select: { id: true, name: true } },
@@ -96,6 +98,7 @@ export async function createPurchaseRequest(
       productStatus: request.product.status,
       buyerId: request.buyer.id,
       buyerName: request.buyer.name.split(" ")[0],
+    sellerName: request.product.seller.name.split(" ")[0],
       status: request.status,
       note: request.note,
       sellerMarkedSoldAt: request.sellerMarkedSoldAt,
@@ -141,6 +144,7 @@ export async function getPurchaseRequests(role: "buyer" | "seller"): Promise<Pur
     productStatus: r.product.status,
     buyerId: r.buyer.id,
     buyerName: r.buyer.name.split(" ")[0],
+    sellerName: r.product.seller.name.split(" ")[0],
     status: r.status,
     note: r.note,
     sellerMarkedSoldAt: r.sellerMarkedSoldAt,
@@ -188,6 +192,7 @@ export async function getPurchaseRequest(requestId: string): Promise<PurchaseReq
     productStatus: request.product.status,
     buyerId: request.buyer.id,
     buyerName: request.buyer.name.split(" ")[0],
+    sellerName: request.product.seller.name.split(" ")[0],
     status: request.status,
     note: request.note,
     sellerMarkedSoldAt: request.sellerMarkedSoldAt,
@@ -254,7 +259,6 @@ export async function updatePurchaseRequestStatus(
     const updateData: Record<string, unknown> = { status: newStatus };
 
     if (newStatus === "ACCEPTED") {
-      updateData.sellerMarkedSoldAt = new Date();
       // Pause the listing so no new requests come in
       await tx.product.update({
         where: { id: request.productId },
@@ -262,15 +266,18 @@ export async function updatePurchaseRequestStatus(
       });
     }
     if (newStatus === "COMPLETED") {
-      if (isSeller) updateData.sellerMarkedSoldAt = new Date();
-      if (isBuyer) updateData.buyerConfirmedAt = new Date();
-      // Check if both parties confirmed
+      // Each side confirms for themselves. The deal only completes (and the item is only marked SOLD)
+      // once BOTH have confirmed, so neither party can close it alone.
       const fresh = await tx.purchaseRequest.findUnique({ where: { id: requestId }, select: { sellerMarkedSoldAt: true, buyerConfirmedAt: true } });
-      if (fresh?.sellerMarkedSoldAt && fresh?.buyerConfirmedAt) {
-        await tx.product.update({
-          where: { id: request.productId },
-          data: { status: "SOLD" },
-        });
+      const now = new Date();
+      const sellerAt = fresh?.sellerMarkedSoldAt ?? (isSeller ? now : null);
+      const buyerAt = fresh?.buyerConfirmedAt ?? (isBuyer ? now : null);
+      if (isSeller) updateData.sellerMarkedSoldAt = sellerAt;
+      if (isBuyer) updateData.buyerConfirmedAt = buyerAt;
+      if (sellerAt && buyerAt) {
+        await tx.product.update({ where: { id: request.productId }, data: { status: "SOLD" } });
+      } else {
+        updateData.status = "ACCEPTED"; // still waiting for the other side
       }
     }
     if (newStatus === "DECLINED" || newStatus === "CANCELLED") {
@@ -300,6 +307,7 @@ export async function updatePurchaseRequestStatus(
             price: true,
             status: true,
             images: { orderBy: { position: "asc" }, take: 1, select: { url: true } },
+            seller: { select: { id: true, name: true } },
           },
         },
         buyer: { select: { id: true, name: true } },
@@ -318,6 +326,7 @@ export async function updatePurchaseRequestStatus(
       productStatus: updated.product.status,
       buyerId: updated.buyer.id,
       buyerName: updated.buyer.name.split(" ")[0],
+      sellerName: updated.product.seller.name.split(" ")[0],
       status: updated.status,
       note: updated.note,
       sellerMarkedSoldAt: updated.sellerMarkedSoldAt,
