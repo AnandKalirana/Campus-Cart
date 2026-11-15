@@ -1,28 +1,14 @@
 "use client";
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Check, ChevronDown, MapPin } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CAMPUSES } from "@/lib/catalog";
+import { campusShort, setCampus, useCampus } from "@/lib/campus-store";
 
-const STORAGE_KEY = "cc.campus";
-const EVENT = "cc-campus-change";
-
-function subscribe(cb: () => void) {
-  window.addEventListener("storage", cb);
-  window.addEventListener(EVENT, cb);
-  return () => { window.removeEventListener("storage", cb); window.removeEventListener(EVENT, cb); };
-}
-function readCampus(): string {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && (CAMPUSES as readonly string[]).includes(saved)) return saved;
-  } catch {}
-  return CAMPUSES[0];
-}
-
-export function CampusSelector() {
+/** `compact` shows the short code ("UW") to save header width; the full name stays in the accessible name. */
+export function CampusSelector({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
-  const campus = useSyncExternalStore(subscribe, readCampus, () => CAMPUSES[0]);
+  const campus = useCampus();
   const ref = useRef<HTMLDivElement>(null);
   const listId = useId();
 
@@ -37,16 +23,19 @@ export function CampusSelector() {
 
   const choose = (c: string) => {
     setOpen(false);
-    try { localStorage.setItem(STORAGE_KEY, c); } catch {}
-    window.dispatchEvent(new Event(EVENT));
+    setCampus(c);
   };
 
   return (
     <div ref={ref} className="relative">
       <button type="button" aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={() => setOpen(o => !o)}
-        className="bru-btn h-12 w-full justify-start bg-white px-4 text-sm min-[1400px]:w-auto">
+        className="bru-btn h-12 w-full justify-start bg-white px-4 text-sm min-[1500px]:w-auto">
         <MapPin size={18} aria-hidden />
-        <span title={campus} className="max-w-[110px] truncate 2xl:max-w-[170px]">{campus}</span>
+        {compact ? (
+          <span title={campus}><span aria-hidden>{campusShort(campus)}</span><span className="sr-only">Campus: {campus}</span></span>
+        ) : (
+          <span title={campus} className="max-w-[240px] truncate">{campus}</span>
+        )}
         <ChevronDown size={16} aria-hidden />
       </button>
       <AnimatePresence>
