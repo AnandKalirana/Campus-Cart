@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { Raw } from "@/components/ui/raw";
 import { CONDITIONS, DEMO_PRODUCTS } from "@/lib/catalog";
 import { ProductCard } from "@/components/products/product-card";
 
@@ -12,8 +13,8 @@ export function FreshFinds() {
     <section aria-labelledby="fresh-title" className="mx-auto mt-20 max-w-[1400px] px-5 lg:mt-28 lg:px-6">
       <div className="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <h2 id="fresh-title" className="font-raw text-[clamp(2.25rem,6.5vw,4.5rem)] italic">Fresh finds. Fair prices.</h2>
-          <p className="mt-3 text-xl font-bold">Pre-loved essentials. Ready for their next chapter.</p>
+          <h2 id="fresh-title" className="font-raw text-[clamp(2.25rem,6.5vw,4.5rem)] italic">Hot drops <span aria-hidden>🔥</span></h2>
+          <p className="mt-3 text-xl font-bold">Don&apos;t sleep on these deals.</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative">
@@ -24,7 +25,7 @@ export function FreshFinds() {
             </select>
             <ChevronDown size={18} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" aria-hidden />
           </div>
-          <Link href="/marketplace" className="bru-btn h-14 bg-black px-8 text-xl text-white">View all <ArrowRight size={20} aria-hidden /></Link>
+          <Link href="/marketplace" className="bru-btn h-14 bg-black px-8 text-xl text-white"><Raw>VIEW_ALL</Raw></Link>
         </div>
       </div>
       {items.length ? (

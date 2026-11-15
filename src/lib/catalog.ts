@@ -36,3 +36,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
 export const formatINR = (n: number) => "₹" + new Intl.NumberFormat("en-IN").format(n);
 
 export const CAMPUSES = ["University of Washington", "IIT Bombay", "TCET Mumbai", "University of Mumbai", "VJTI Mumbai"] as const;
+/** Short names used in the slangy copy ("UW EXCLUSIVE"). Keep in sync with CAMPUSES. */
+export const CAMPUS_SHORT: Record<(typeof CAMPUSES)[number], string> = {
+  "University of Washington": "UW", "IIT Bombay": "IITB", "TCET Mumbai": "TCET", "University of Mumbai": "MU", "VJTI Mumbai": "VJTI",
+};

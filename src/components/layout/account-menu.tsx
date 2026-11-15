@@ -9,9 +9,9 @@ export async function AccountMenu() {
   const first = user.name.split(" ")[0];
   return (
     <div className="flex items-center gap-3">
-      <span className="flex h-12 items-center gap-2 border-4 border-black bg-white pr-3" title={user.email}>
-        <span aria-hidden className="grid h-full w-10 place-items-center border-r-4 border-black bg-cc-yellow font-raw text-lg">{first.charAt(0)}</span>
-        <span className="max-w-[120px] truncate font-raw text-base"><span className="sr-only">Signed in as </span>{first}</span>
+      <span className="flex h-12 items-center gap-2 border-4 border-black bg-white" title={`${user.name} (${user.email})`}>
+        <span aria-hidden className="grid h-full w-10 place-items-center bg-cc-yellow font-raw text-lg">{first.charAt(0)}</span>
+        <span className="sr-only">Signed in as {first}</span>
       </span>
       <form action={logoutAction}><button type="submit" className="bru-btn h-12 bg-white px-4 text-base">Log out</button></form>
     </div>
