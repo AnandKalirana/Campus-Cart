@@ -9,9 +9,45 @@ import { CONDITION_LABEL, type ListingCardData } from "@/lib/listing-format";
 
 const CHIP: Record<string, string> = { laptops: "bg-cc-yellow", books: "bg-cc-sky", electronics: "bg-cc-green", "hostel-essentials": "bg-cc-pink" };
 
-export function ProductCard({ product: p, demo = false, headingLevel = 3 }: { product: ListingCardData; demo?: boolean; headingLevel?: 2 | 3 }) {
+interface ProductCardProps {
+  product: ListingCardData;
+  demo?: boolean;
+  headingLevel?: 2 | 3;
+  user?: { id: string; name: string; email: string; role: "STUDENT" | "ADMIN"; emailVerified: boolean; universityId: string | null } | null;
+}
+
+export function ProductCard({ product: p, demo = false, headingLevel = 3, user = null }: ProductCardProps) {
   const H = `h${headingLevel}` as const;
   const [prompt, setPrompt] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      setPrompt(true);
+      return;
+    }
+    if (saving) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: p.id }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setSaved(!saved);
+      }
+    } catch {
+      // silent fail
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <article className="group relative">
       <Link href={`/products/${p.id}`} className="block" aria-label={`${p.title}, ${formatINR(p.price)}`}>
@@ -30,15 +66,15 @@ export function ProductCard({ product: p, demo = false, headingLevel = 3 }: { pr
           <div className="mt-4 flex items-baseline justify-between gap-3">
             <p className="flex items-baseline gap-3">
               <span className="font-raw text-3xl">{formatINR(p.price)}</span>
-              {p.originalPrice ? <s className="strike-bold text-base font-bold text-[#525252]"><span className="sr-only">Original price </span>{formatINR(p.originalPrice)}</s> : null}
+              {p.originalPrice ? <s className="strike-bold text-base font-bold text-[#525252]"><span className="sr-only">Original price </span>{formatINR(p.originalPrice)}  </s> : null}
             </p>
             <span className="text-right text-sm font-bold">{p.campusName}</span>
           </div>
         </div>
       </Link>
-      <button type="button" aria-label={`Save ${p.title} to wishlist`} aria-expanded={prompt} onClick={() => setPrompt(v => !v)}
-        className="bru-btn absolute right-3 top-3 h-11 w-11 bg-white !shadow-[3px_3px_0_#000] hover:!bg-black hover:!text-white">
-        <Heart size={20} aria-hidden />
+      <button type="button" aria-label={saved ? `Remove ${p.title} from wishlist` : `Save ${p.title} to wishlist`} aria-expanded={prompt} onClick={handleSave}
+        className={`bru-btn absolute right-3 top-3 h-11 w-11 !shadow-[3px_3px_0_#000] transition-colors ${saved ? "bg-cc-pink !text-white hover:!bg-cc-pink/80" : "bg-white hover:!bg-black hover:!text-white"}`}>
+        <Heart size={20} aria-hidden className={saved ? "fill-current" : ""} />
       </button>
       <AnimatePresence>
         {prompt && (

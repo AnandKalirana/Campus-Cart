@@ -19,7 +19,7 @@ export async function FreshFinds() {
         <Link href="/marketplace" className="bru-btn h-14 bg-black px-8 text-xl text-white"><Raw>VIEW_ALL</Raw></Link>
       </div>
       <ul className="mt-14 grid grid-cols-1 gap-x-8 gap-y-14 min-[560px]:grid-cols-2 lg:grid-cols-4 lg:gap-x-10">
-        {items!.map((p, i) => <li key={p.id} className={i % 2 ? "lg:mt-16" : ""}><ProductCard product={p} demo={demo} /></li>)}
+        {items!.map((p, i) => <li key={p.id} className={i % 2 ? "lg:mt-16" : ""}><ProductCard product={p} demo={demo} user={null} /></li>)}
       </ul>
       {demo && <p className="mt-10 border-l-8 border-black pl-4 text-sm font-bold">Sample listings shown for design preview. They are not real inventory.</p>}
     </section>

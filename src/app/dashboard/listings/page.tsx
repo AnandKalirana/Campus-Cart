@@ -18,7 +18,7 @@ async function Mine() {
     <ul className="grid grid-cols-1 gap-x-8 gap-y-14 min-[560px]:grid-cols-2 lg:grid-cols-4">
       {items.map(p => (
         <li key={p.id}>
-          <ProductCard product={p} headingLevel={2} />
+          <ProductCard product={p} headingLevel={2} user={user} />
           <p className="mt-3 flex items-center gap-3">
             <span className="font-raw border-2 border-black bg-white px-2 py-0.5 text-xs">{STATUS_LABEL[p.status]}</span>
             <Link href={`/sell/${p.id}/edit`} className="font-bold underline decoration-2 underline-offset-4 hover:bg-black hover:text-white">Edit</Link>

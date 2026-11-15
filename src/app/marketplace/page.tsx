@@ -6,6 +6,7 @@ import { FilterForm } from "@/components/marketplace/filter-form";
 import { parseSearchParams, type SearchParams } from "@/lib/validation/listing";
 import { listCategoriesAndCampuses, searchListings } from "@/services/listing-service";
 import { PAGE_SIZE } from "@/lib/listing-format";
+import { getCurrentUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Marketplace", description: "Browse student listings from your campus. No account needed to look around." };
 
@@ -21,6 +22,7 @@ function pageHref(p: SearchParams, page: number) {
 
 async function Results({ searchParams }: Props) {
   const p = parseSearchParams(await searchParams);
+  const user = await getCurrentUser();
   let data;
   try {
     const [meta, res] = await Promise.all([listCategoriesAndCampuses(), searchListings(p)]);
@@ -41,7 +43,7 @@ async function Results({ searchParams }: Props) {
       </p>
       {res.items.length ? (
         <ul className="mt-8 grid grid-cols-1 gap-x-8 gap-y-14 min-[560px]:grid-cols-2 lg:grid-cols-4 lg:gap-x-10">
-          {res.items.map(item => <li key={item.id}><ProductCard product={item} headingLevel={2} /></li>)}
+          {res.items.map(item => <li key={item.id}><ProductCard product={item} headingLevel={2} user={user} /></li>)}
         </ul>
       ) : (
         <div className="bru-card mt-8 p-8">
