@@ -1,25 +1,17 @@
-import { getCurrentUser } from "@/lib/session";
-import { markMessagesRead } from "@/services/messaging-service";
 import { z } from "zod";
+import { guardJson, serverError } from "@/lib/api-route";
+import { inboxReadLimiter } from "@/lib/request-guards";
+import { idSchema } from "@/lib/validation/listing";
+import { markMessagesRead } from "@/services/messaging-service";
 
-const bodySchema = z.object({ messageId: z.string().optional() });
+// POST /api/conversations/:conversationId/read { messageId? } — marks the OTHER party's messages read. Participants only.
+const schema = z.object({ messageId: idSchema.optional() });
 
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const user = await getCurrentUser();
-  if (!user) return Response.json({ ok: false, code: "unauthorized" }, { status: 401 });
-
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const g = await guardJson(req, inboxReadLimiter, schema);
+  if (!g.ok) return g.res;
   const { id } = await params;
-  const json = await req.json();
-  const parsed = bodySchema.safeParse(json);
-  if (!parsed.success) return Response.json({ ok: false, code: "invalid" }, { status: 400 });
-
-  try {
-    await markMessagesRead(id, parsed.data.messageId);
-    return Response.json({ ok: true });
-  } catch {
-    return Response.json({ ok: false, code: "not_found" }, { status: 404 });
-  }
+  if (!idSchema.safeParse(id).success) return g.ctx.json({ ok: false, code: "not_found", message: "Not found." }, 404);
+  try { await markMessagesRead(id, g.body.messageId); return g.ctx.json({ ok: true }); }
+  catch (e) { return serverError(g.ctx, "mark_read_failed", e); }
 }

@@ -7,6 +7,7 @@ import { parseSearchParams, type SearchParams } from "@/lib/validation/listing";
 import { listCategoriesAndCampuses, searchListings } from "@/services/listing-service";
 import { PAGE_SIZE } from "@/lib/listing-format";
 import { getCurrentUser } from "@/lib/session";
+import { savedIdsFor } from "@/services/wishlist-service";
 
 export const metadata: Metadata = { title: "Marketplace", description: "Browse student listings from your campus. No account needed to look around." };
 
@@ -33,6 +34,7 @@ async function Results({ searchParams }: Props) {
     );
   }
   const { meta, res } = data;
+  const saved = await savedIdsFor(user?.id, res.items.map(i => i.id)).catch(() => new Set<string>());
   return (
     <div className="mx-auto max-w-[1400px] px-5 pb-24 pt-12 lg:px-6">
       <h1 className="font-raw text-[clamp(2.5rem,7vw,5rem)] leading-[0.9]">Find your <span className="underline decoration-8 underline-offset-8">next find</span></h1>
@@ -43,7 +45,7 @@ async function Results({ searchParams }: Props) {
       </p>
       {res.items.length ? (
         <ul className="mt-8 grid grid-cols-1 gap-x-8 gap-y-14 min-[560px]:grid-cols-2 lg:grid-cols-4 lg:gap-x-10">
-          {res.items.map(item => <li key={item.id}><ProductCard product={item} headingLevel={2} user={user} /></li>)}
+          {res.items.map(item => <li key={item.id}><ProductCard product={item} headingLevel={2} signedIn={!!user} initialSaved={saved.has(item.id)} /></li>)}
         </ul>
       ) : (
         <div className="bru-card mt-8 p-8">

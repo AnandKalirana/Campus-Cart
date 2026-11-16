@@ -1,43 +1,33 @@
-import { getCurrentUser } from "@/lib/session";
-import { createPurchaseRequest, getPurchaseRequests } from "@/services/purchase-request-service";
-import type { Actor } from "@/services/listing-service";
 import { z } from "zod";
+import { guardJson, guardRead, serverError, toActor } from "@/lib/api-route";
+import { inboxReadLimiter, offerCreateLimiter } from "@/lib/request-guards";
+import { idSchema } from "@/lib/validation/listing";
+import { createPurchaseRequest, getPurchaseRequests } from "@/services/purchase-request-service";
+import { log } from "@/lib/log";
 
-const createSchema = z.object({
-  productId: z.string().min(1),
-  note: z.string().max(500).optional(),
-});
+// GET  /api/purchase-requests — the caller's own offers (as buyer) and offers on their listings (as seller).
+// POST /api/purchase-requests { productId, note? } — one open offer per buyer per listing. 10 offers / hour / user.
+const createSchema = z.object({ productId: idSchema, note: z.string().trim().max(500, "Keep the note under 500 characters.").optional() });
 
-export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) return Response.json({ ok: false, code: "unauthorized" }, { status: 401 });
-
+export async function GET(req: Request) {
+  const g = await guardRead(req, inboxReadLimiter);
+  if (!g.ok) return g.res;
   try {
-    const [buyerRequests, sellerRequests] = await Promise.all([
-      getPurchaseRequests("buyer"),
-      getPurchaseRequests("seller"),
-    ]);
-    return Response.json({ ok: true, buyerRequests, sellerRequests });
-  } catch {
-    return Response.json({ ok: false, code: "error" }, { status: 500 });
-  }
+    const [buyerRequests, sellerRequests] = await Promise.all([getPurchaseRequests("buyer"), getPurchaseRequests("seller")]);
+    return g.ctx.json({ ok: true, buyerRequests, sellerRequests });
+  } catch (e) { return serverError(g.ctx, "offers_list_failed", e); }
 }
 
 export async function POST(req: Request) {
-  const user = await getCurrentUser();
-  if (!user) return Response.json({ ok: false, code: "unauthorized" }, { status: 401 });
-
-  const json = await req.json();
-  const parsed = createSchema.safeParse(json);
-  if (!parsed.success) return Response.json({ ok: false, code: "invalid" }, { status: 400 });
-
-  const actor: Actor = { id: user.id, name: user.name, role: user.role, emailVerified: user.emailVerified, universityId: user.universityId };
-  const result = await createPurchaseRequest(actor, parsed.data.productId, parsed.data.note);
-
-  if (!result.ok) {
-    const status = result.code === "forbidden" ? 403 : result.code === "not_found" ? 404 : result.code === "conflict" ? 409 : 400;
-    return Response.json({ ok: false, code: result.code, message: result.message }, { status });
-  }
-
-  return Response.json({ ok: true, request: result.request });
+  const g = await guardJson(req, offerCreateLimiter, createSchema);
+  if (!g.ok) return g.res;
+  try {
+    const r = await createPurchaseRequest(toActor(g.user), g.body.productId, g.body.note);
+    if (!r.ok) {
+      const status = { forbidden: 403, not_found: 404, conflict: 409, limit: 429, invalid: 422 }[r.code];
+      return g.ctx.json({ ok: false, code: r.code, message: r.message }, status);
+    }
+    log("info", "offer_created", { rid: g.ctx.rid, uid: g.user.id, pid: g.body.productId });
+    return g.ctx.json({ ok: true, request: r.request }, 201);
+  } catch (e) { return serverError(g.ctx, "offer_create_failed", e); }
 }

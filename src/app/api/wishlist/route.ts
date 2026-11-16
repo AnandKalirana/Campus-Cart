@@ -1,32 +1,20 @@
-import { getCurrentUser } from "@/lib/session";
-import { db } from "@/lib/db";
 import { z } from "zod";
+import { guardJson, serverError } from "@/lib/api-route";
+import { wishlistLimiter } from "@/lib/request-guards";
+import { idSchema } from "@/lib/validation/listing";
+import { setSaved } from "@/services/wishlist-service";
 
-const bodySchema = z.object({ productId: z.string().min(1) });
+// POST /api/wishlist  { productId, saved }
+// Auth: required. Authz: acts only on the caller's own wishlist (user id comes from the session, never the body).
+// Limit: 120 / 10 min / user. Errors: 400 bad JSON, 401, 403 cross-origin, 404, 413, 422, 429, 500.
+const schema = z.object({ productId: idSchema, saved: z.boolean() });
 
 export async function POST(req: Request) {
-  const user = await getCurrentUser();
-  if (!user) return Response.json({ ok: false, code: "unauthorized" }, { status: 401 });
-
-  const json = await req.json();
-  const parsed = bodySchema.safeParse(json);
-  if (!parsed.success) return Response.json({ ok: false, code: "invalid" }, { status: 400 });
-
+  const g = await guardJson(req, wishlistLimiter, schema);
+  if (!g.ok) return g.res;
   try {
-    const existing = await db().wishlist.findUnique({
-      where: { userId_productId: { userId: user.id, productId: parsed.data.productId } },
-    });
-
-    if (existing) {
-      await db().wishlist.delete({ where: { userId_productId: { userId: user.id, productId: parsed.data.productId } } });
-      return Response.json({ ok: true, saved: false });
-    }
-
-    await db().wishlist.create({
-      data: { userId: user.id, productId: parsed.data.productId },
-    });
-    return Response.json({ ok: true, saved: true });
-  } catch {
-    return Response.json({ ok: false, code: "error" }, { status: 500 });
-  }
+    const r = await setSaved(g.user.id, g.body.productId, g.body.saved);
+    if (!r.ok) return g.ctx.json({ ok: false, code: "not_found", message: "Listing not found." }, 404);
+    return g.ctx.json({ ok: true, saved: r.saved });
+  } catch (e) { return serverError(g.ctx, "wishlist_failed", e); }
 }

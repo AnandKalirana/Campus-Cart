@@ -1,14 +1,11 @@
-import { getCurrentUser } from "@/lib/session";
+import { guardRead, serverError } from "@/lib/api-route";
+import { inboxReadLimiter } from "@/lib/request-guards";
 import { getConversations } from "@/services/messaging-service";
 
-export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) return Response.json({ ok: false, code: "unauthorized" }, { status: 401 });
-
-  try {
-    const conversations = await getConversations();
-    return Response.json({ ok: true, conversations });
-  } catch {
-    return Response.json({ ok: false, code: "error" }, { status: 500 });
-  }
+// GET /api/conversations — the caller's own threads only (the service filters by session user). 401, 429, 500.
+export async function GET(req: Request) {
+  const g = await guardRead(req, inboxReadLimiter);
+  if (!g.ok) return g.res;
+  try { return g.ctx.json({ ok: true, conversations: await getConversations() }); }
+  catch (e) { return serverError(g.ctx, "conversations_failed", e); }
 }

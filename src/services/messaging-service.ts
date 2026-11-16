@@ -237,3 +237,35 @@ export async function getUnreadCount(): Promise<number> {
     },
   });
 }
+/** The buyer's existing thread for a listing, if any (so the product page can offer "Open chat" instead of a second composer). */
+export async function findBuyerConversationId(buyerId: string, productId: string): Promise<string | null> {
+  const c = await db().conversation.findUnique({ where: { productId_buyerId: { productId, buyerId } }, select: { id: true } });
+  return c?.id ?? null;
+}
+
+/**
+ * Reply inside an existing thread. Either participant may reply (the seller could not before: sendMessage refuses the listing's owner).
+ * Strangers get the same "not found" as a thread that does not exist.
+ */
+export async function replyInConversation(actor: Actor, conversationId: string, body: string): Promise<SendMessageResult> {
+  const trimmed = body.trim();
+  if (!trimmed || trimmed.length > 2000) return { ok: false, code: "invalid", message: "Message must be 1-2000 characters" };
+  const c = await db().conversation.findUnique({
+    where: { id: conversationId },
+    select: { id: true, buyerId: true, sellerId: true, product: { select: { status: true } }, buyer: { select: { status: true } }, seller: { select: { status: true } } },
+  });
+  if (!c || (c.buyerId !== actor.id && c.sellerId !== actor.id)) return { ok: false, code: "not_found", message: "Conversation not found" };
+  if (c.product.status === "REMOVED" || c.buyer.status !== "ACTIVE" || c.seller.status !== "ACTIVE") {
+    return { ok: false, code: "forbidden", message: "This conversation is closed" };
+  }
+  const msg = await db().$transaction(async tx => {
+    const m = await tx.message.create({ data: { conversationId: c.id, senderId: actor.id, body: trimmed } });
+    await tx.conversation.update({ where: { id: c.id }, data: { updatedAt: new Date() } });
+    return m;
+  });
+  return {
+    ok: true,
+    conversationId: c.id,
+    message: { id: msg.id, conversationId: msg.conversationId, senderId: msg.senderId, senderName: actor.name.split(" ")[0], body: msg.body, readAt: msg.readAt, createdAt: msg.createdAt, isOwn: true },
+  };
+}
