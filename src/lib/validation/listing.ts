@@ -27,7 +27,8 @@ export const listingInputSchema = z
 
 export type ListingInput = z.infer<typeof listingInputSchema>;
 
-const cuidLike = z.string().regex(/^[a-z0-9]{20,32}$/i, "Invalid id.");
+// Shape check only (queries are parameterised). Allows cuids and the underscore ids used by the demo seed.
+const cuidLike = z.string().regex(/^[A-Za-z0-9_-]{10,40}$/, "Invalid id.");
 export const idSchema = cuidLike;
 
 export const searchParamsSchema = z.object({

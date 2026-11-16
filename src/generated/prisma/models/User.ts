@@ -283,6 +283,7 @@ export type UserWhereInput = {
   purchaseRequests?: Prisma.PurchaseRequestListRelationFilter
   reportsFiled?: Prisma.ReportListRelationFilter
   reportsResolved?: Prisma.ReportListRelationFilter
+  auditLogs?: Prisma.AuditLogListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
 }
 
@@ -310,6 +311,7 @@ export type UserOrderByWithRelationInput = {
   purchaseRequests?: Prisma.PurchaseRequestOrderByRelationAggregateInput
   reportsFiled?: Prisma.ReportOrderByRelationAggregateInput
   reportsResolved?: Prisma.ReportOrderByRelationAggregateInput
+  auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
@@ -340,6 +342,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   purchaseRequests?: Prisma.PurchaseRequestListRelationFilter
   reportsFiled?: Prisma.ReportListRelationFilter
   reportsResolved?: Prisma.ReportListRelationFilter
+  auditLogs?: Prisma.AuditLogListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
 }, "id" | "email">
 
@@ -404,6 +407,7 @@ export type UserCreateInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -430,6 +434,7 @@ export type UserUncheckedCreateInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -456,6 +461,7 @@ export type UserUpdateInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -482,6 +488,7 @@ export type UserUncheckedUpdateInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -820,6 +827,22 @@ export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
+export type UserCreateNestedOneWithoutAuditLogsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAuditLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
+  upsert?: Prisma.UserUpsertWithoutAuditLogsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+}
+
 export type UserCreateWithoutUniversityInput = {
   id?: string
   email: string
@@ -842,6 +865,7 @@ export type UserCreateWithoutUniversityInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -867,6 +891,7 @@ export type UserUncheckedCreateWithoutUniversityInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -936,6 +961,7 @@ export type UserCreateWithoutAccountsInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -961,6 +987,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1002,6 +1029,7 @@ export type UserUpdateWithoutAccountsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1027,6 +1055,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1052,6 +1081,7 @@ export type UserCreateWithoutTokensInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1077,6 +1107,7 @@ export type UserUncheckedCreateWithoutTokensInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1118,6 +1149,7 @@ export type UserUpdateWithoutTokensInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1143,6 +1175,7 @@ export type UserUncheckedUpdateWithoutTokensInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1168,6 +1201,7 @@ export type UserCreateWithoutProductsInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1193,6 +1227,7 @@ export type UserUncheckedCreateWithoutProductsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1234,6 +1269,7 @@ export type UserUpdateWithoutProductsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1259,6 +1295,7 @@ export type UserUncheckedUpdateWithoutProductsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1284,6 +1321,7 @@ export type UserCreateWithoutWishlistInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1309,6 +1347,7 @@ export type UserUncheckedCreateWithoutWishlistInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1350,6 +1389,7 @@ export type UserUpdateWithoutWishlistInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1375,6 +1415,7 @@ export type UserUncheckedUpdateWithoutWishlistInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1400,6 +1441,7 @@ export type UserCreateWithoutBuyerChatsInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1425,6 +1467,7 @@ export type UserUncheckedCreateWithoutBuyerChatsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1455,6 +1498,7 @@ export type UserCreateWithoutSellerChatsInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1480,6 +1524,7 @@ export type UserUncheckedCreateWithoutSellerChatsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1521,6 +1566,7 @@ export type UserUpdateWithoutBuyerChatsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1546,6 +1592,7 @@ export type UserUncheckedUpdateWithoutBuyerChatsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1582,6 +1629,7 @@ export type UserUpdateWithoutSellerChatsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1607,6 +1655,7 @@ export type UserUncheckedUpdateWithoutSellerChatsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1632,6 +1681,7 @@ export type UserCreateWithoutMessagesInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1657,6 +1707,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1698,6 +1749,7 @@ export type UserUpdateWithoutMessagesInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1723,6 +1775,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1748,6 +1801,7 @@ export type UserCreateWithoutPurchaseRequestsInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1773,6 +1827,7 @@ export type UserUncheckedCreateWithoutPurchaseRequestsInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1814,6 +1869,7 @@ export type UserUpdateWithoutPurchaseRequestsInput = {
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1839,6 +1895,7 @@ export type UserUncheckedUpdateWithoutPurchaseRequestsInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1864,6 +1921,7 @@ export type UserCreateWithoutReportsFiledInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1889,6 +1947,7 @@ export type UserUncheckedCreateWithoutReportsFiledInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1919,6 +1978,7 @@ export type UserCreateWithoutReportsResolvedInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1944,6 +2004,7 @@ export type UserUncheckedCreateWithoutReportsResolvedInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1985,6 +2046,7 @@ export type UserUpdateWithoutReportsFiledInput = {
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -2010,6 +2072,7 @@ export type UserUncheckedUpdateWithoutReportsFiledInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -2046,6 +2109,7 @@ export type UserUpdateWithoutReportsResolvedInput = {
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -2071,6 +2135,7 @@ export type UserUncheckedUpdateWithoutReportsResolvedInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -2097,6 +2162,7 @@ export type UserCreateWithoutNotificationsInput = {
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -2122,6 +2188,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
   reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -2163,6 +2230,7 @@ export type UserUpdateWithoutNotificationsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -2188,6 +2256,127 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutAuditLogsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  name: string
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  university?: Prisma.UniversityCreateNestedOneWithoutUsersInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  tokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  wishlist?: Prisma.WishlistCreateNestedManyWithoutUserInput
+  buyerChats?: Prisma.ConversationCreateNestedManyWithoutBuyerInput
+  sellerChats?: Prisma.ConversationCreateNestedManyWithoutSellerInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutBuyerInput
+  reportsFiled?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsResolved?: Prisma.ReportCreateNestedManyWithoutResolvedByInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAuditLogsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  name: string
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  sessionVersion?: number
+  universityId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  tokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  wishlist?: Prisma.WishlistUncheckedCreateNestedManyWithoutUserInput
+  buyerChats?: Prisma.ConversationUncheckedCreateNestedManyWithoutBuyerInput
+  sellerChats?: Prisma.ConversationUncheckedCreateNestedManyWithoutSellerInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutBuyerInput
+  reportsFiled?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsResolved?: Prisma.ReportUncheckedCreateNestedManyWithoutResolvedByInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAuditLogsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+}
+
+export type UserUpsertWithoutAuditLogsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuditLogsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+}
+
+export type UserUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  university?: Prisma.UniversityUpdateOneWithoutUsersNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  tokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  wishlist?: Prisma.WishlistUpdateManyWithoutUserNestedInput
+  buyerChats?: Prisma.ConversationUpdateManyWithoutBuyerNestedInput
+  sellerChats?: Prisma.ConversationUpdateManyWithoutSellerNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
+  reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  universityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  tokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  wishlist?: Prisma.WishlistUncheckedUpdateManyWithoutUserNestedInput
+  buyerChats?: Prisma.ConversationUncheckedUpdateManyWithoutBuyerNestedInput
+  sellerChats?: Prisma.ConversationUncheckedUpdateManyWithoutSellerNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyUniversityInput = {
@@ -2226,6 +2415,7 @@ export type UserUpdateWithoutUniversityInput = {
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -2251,6 +2441,7 @@ export type UserUncheckedUpdateWithoutUniversityInput = {
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutBuyerNestedInput
   reportsFiled?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsResolved?: Prisma.ReportUncheckedUpdateManyWithoutResolvedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -2284,6 +2475,7 @@ export type UserCountOutputType = {
   purchaseRequests: number
   reportsFiled: number
   reportsResolved: number
+  auditLogs: number
   notifications: number
 }
 
@@ -2298,6 +2490,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   purchaseRequests?: boolean | UserCountOutputTypeCountPurchaseRequestsArgs
   reportsFiled?: boolean | UserCountOutputTypeCountReportsFiledArgs
   reportsResolved?: boolean | UserCountOutputTypeCountReportsResolvedArgs
+  auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
 }
 
@@ -2384,6 +2577,13 @@ export type UserCountOutputTypeCountReportsResolvedArgs<ExtArgs extends runtime.
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.NotificationWhereInput
 }
@@ -2413,6 +2613,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   purchaseRequests?: boolean | Prisma.User$purchaseRequestsArgs<ExtArgs>
   reportsFiled?: boolean | Prisma.User$reportsFiledArgs<ExtArgs>
   reportsResolved?: boolean | Prisma.User$reportsResolvedArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -2477,6 +2678,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   purchaseRequests?: boolean | Prisma.User$purchaseRequestsArgs<ExtArgs>
   reportsFiled?: boolean | Prisma.User$reportsFiledArgs<ExtArgs>
   reportsResolved?: boolean | Prisma.User$reportsResolvedArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2501,6 +2703,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     purchaseRequests: Prisma.$PurchaseRequestPayload<ExtArgs>[]
     reportsFiled: Prisma.$ReportPayload<ExtArgs>[]
     reportsResolved: Prisma.$ReportPayload<ExtArgs>[]
+    auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2921,6 +3124,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   purchaseRequests<T extends Prisma.User$purchaseRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$purchaseRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reportsFiled<T extends Prisma.User$reportsFiledArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reportsFiledArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reportsResolved<T extends Prisma.User$reportsResolvedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reportsResolvedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3620,6 +3824,30 @@ export type User$reportsResolvedArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.ReportScalarFieldEnum | Prisma.ReportScalarFieldEnum[]
+}
+
+/**
+ * User.auditLogs
+ */
+export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuditLog
+   */
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuditLog
+   */
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
 }
 
 /**

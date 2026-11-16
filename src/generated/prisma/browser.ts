@@ -82,3 +82,8 @@ export type Report = Prisma.ReportModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel

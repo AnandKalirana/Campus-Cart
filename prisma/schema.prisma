@@ -96,6 +96,7 @@ model User {
   purchaseRequests PurchaseRequest[]
   reportsFiled     Report[]          @relation("ReportReporter")
   reportsResolved  Report[]          @relation("ReportResolver")
+  auditLogs        AuditLog[]        @relation("AuditActor")
   notifications    Notification[]
 
   @@index([universityId])
@@ -288,4 +289,20 @@ model Notification {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, readAt, createdAt(sort: Desc)])
+}
+
+// Append-only record of what an admin did. Written in the same transaction as the change it describes.
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String   @db.VarChar(60) // e.g. "listing.remove"
+  targetType String   @db.VarChar(30) // "listing" | "user" | "report" | "campus"
+  targetId   String   @db.VarChar(40)
+  detail     String?  @db.VarChar(500)
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt(sort: Desc)])
+  @@index([targetType, targetId])
 }
