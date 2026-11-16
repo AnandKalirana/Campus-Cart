@@ -90,7 +90,7 @@ export async function getConversations(): Promise<ConversationWithDetails[]> {
 }
 
 /** Get messages for a conversation (paginated, newest first) */
-export async function getMessages(conversationId: string, cursor?: string, limit = 50): Promise<{ messages: MessageWithSender[]; nextCursor: string | null }> {
+export async function getMessages(conversationId: string, cursor?: string, limit = 50, after?: string): Promise<{ messages: MessageWithSender[]; nextCursor: string | null }> {
   const user = await requireUser("/messages");
 
   const conversation = await db().conversation.findUnique({
@@ -104,9 +104,10 @@ export async function getMessages(conversationId: string, cursor?: string, limit
   const messages = await db().message.findMany({
     where: {
       conversationId,
-      ...(cursor && { createdAt: { lt: new Date(cursor) } }),
+      ...(after ? { createdAt: { gt: new Date(after) } } : cursor ? { createdAt: { lt: new Date(cursor) } } : {}),
     },
-    orderBy: { createdAt: "desc" },
+    // `after` = newer than this (live polling, oldest first); otherwise newest first for paging back through history.
+    orderBy: { createdAt: after ? "asc" : "desc" },
     take: limit + 1,
     include: { sender: { select: { id: true, name: true } } },
   });
@@ -125,7 +126,7 @@ export async function getMessages(conversationId: string, cursor?: string, limit
       readAt: m.readAt,
       createdAt: m.createdAt,
       isOwn: m.senderId === user.id,
-    })).reverse(),
+    })).sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()), // always oldest first
     nextCursor,
   };
 }

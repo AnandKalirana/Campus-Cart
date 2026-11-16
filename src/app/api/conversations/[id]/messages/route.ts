@@ -5,7 +5,7 @@ import { idSchema } from "@/lib/validation/listing";
 import { getMessages, sendMessage } from "@/services/messaging-service";
 import { log } from "@/lib/log";
 
-// GET  /api/conversations/:conversationId/messages?cursor=<iso>&limit=1..50 — participants only; others get 404.
+// GET  /api/conversations/:conversationId/messages?cursor=<iso> (older) | after=<iso> (newer, for polling) &limit=1..50 — participants only; others get 404.
 // POST /api/conversations/:productId/messages { body } — buyer starts or continues their thread about that listing.
 //   (The path segment is a conversation id for GET but a listing id for POST. Kept for compatibility with the existing client.)
 // Limits: send 30 / 10 min and 300 / day per user; reads 600 / 10 min. Body 1..2000 chars.
@@ -18,10 +18,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const { id } = await params;
   const url = new URL(req.url);
   const cursor = cursorSchema.safeParse(url.searchParams.get("cursor") ?? undefined);
+  const after = cursorSchema.safeParse(url.searchParams.get("after") ?? undefined);
   const limit = Math.min(50, Math.max(1, Number(url.searchParams.get("limit")) || 50));
-  if (!idSchema.safeParse(id).success || !cursor.success) return g.ctx.json({ ok: false, code: "not_found", message: "Not found." }, 404);
+  if (!idSchema.safeParse(id).success || !cursor.success || !after.success) return g.ctx.json({ ok: false, code: "not_found", message: "Not found." }, 404);
   try {
-    return g.ctx.json({ ok: true, ...(await getMessages(id, cursor.data, limit)) });
+    return g.ctx.json({ ok: true, ...(await getMessages(id, cursor.data, limit, after.data)) });
   } catch {
     return g.ctx.json({ ok: false, code: "not_found", message: "Not found." }, 404);
   }
