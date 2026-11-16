@@ -45,3 +45,4 @@ next-env.d.ts
 /src/generated/
 .neon
 .data/
+.claude/settings.local.json

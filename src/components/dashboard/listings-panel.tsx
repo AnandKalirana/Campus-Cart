@@ -60,7 +60,7 @@ export function ListingsPanel({ listings }: ListingsPanelProps) {
           <ul className="space-y-4 md:hidden">
             {rows.map(l => (
               <li key={l.id} className="bru-card flex gap-4 p-4">
-                <Image src={l.image ?? "/images/demo/laptop.svg"} alt={l.imageAlt} width={80} height={80} className="h-20 w-20 flex-shrink-0 border-2 border-black object-cover" />
+                {l.image ? <Image src={l.image} alt={l.imageAlt} width={80} height={80} className="h-20 w-20 flex-shrink-0 border-2 border-black object-cover" /> : <span role="img" aria-label="No photo" className="font-raw grid h-20 w-20 flex-shrink-0 place-items-center border-2 border-black bg-white text-[10px]">NO_PIC</span>}
                 <div className="flex min-w-0 flex-1 flex-col justify-between">
                   <div>
                     <p className="text-base font-bold leading-tight">{l.title}</p>
@@ -85,7 +85,7 @@ export function ListingsPanel({ listings }: ListingsPanelProps) {
                   {rows.map(l => (
                     <tr key={l.id}>
                       <td className="flex items-center gap-4 p-4">
-                        <Image src={l.image ?? "/images/demo/laptop.svg"} alt={l.imageAlt} width={64} height={64} className="h-16 w-16 flex-shrink-0 border-2 border-black object-cover" />
+                        {l.image ? <Image src={l.image} alt={l.imageAlt} width={64} height={64} className="h-16 w-16 flex-shrink-0 border-2 border-black object-cover" /> : <span role="img" aria-label="No photo" className="font-raw grid h-16 w-16 flex-shrink-0 place-items-center border-2 border-black bg-white text-[10px]">NO_PIC</span>}
                         <span><span className="block text-lg leading-tight">{l.title}</span><span className="text-xs text-cc-muted">{l.categoryName}</span></span>
                       </td>
                       <td className="font-raw p-4 text-2xl">{formatINR(l.price)}</td>

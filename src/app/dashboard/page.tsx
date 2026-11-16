@@ -34,7 +34,7 @@ async function Body() {
       <StatCards stats={data.stats} />
       <div className="mb-12 grid grid-cols-[minmax(0,1fr)] gap-10 md:mb-20 lg:grid-cols-3 lg:gap-16">
         <ListingsPanel listings={data.listings} />
-        <InboxAndPickup conversations={data.listings} purchaseRequests={data.purchaseRequests.seller} />
+        <InboxAndPickup conversations={data.conversations} purchaseRequests={data.purchaseRequests.seller} accepted={[...data.purchaseRequests.seller, ...data.purchaseRequests.buyer].filter(r => r.status === "ACCEPTED")} />
       </div>
       <PurchaseRequestsPanel buyerRequests={data.purchaseRequests.buyer} sellerRequests={data.purchaseRequests.seller} />
       <SavedAndPromo stats={data.stats} />
