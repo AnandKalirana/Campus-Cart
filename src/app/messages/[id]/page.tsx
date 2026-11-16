@@ -8,7 +8,7 @@ import { ConversationThread } from "@/components/messages/conversation-thread";
 export const metadata: Metadata = { title: "Messages", robots: { index: false } };
 
 async function ConversationPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireUser("/messages");
+  const user = await requireUser("/messages");
   const { id } = await params;
 
   const conversations = await getConversations();
@@ -20,6 +20,7 @@ async function ConversationPage({ params }: { params: Promise<{ id: string }> })
   return (
     <section className="mx-auto max-w-[760px] px-5 pb-16 pt-12">
       <ConversationThread
+        viewerId={user.id}
         initialConversation={conversation}
         initialMessages={messages}
         nextCursor={nextCursor}
