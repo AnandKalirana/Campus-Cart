@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/lib/session";
 import { idSchema } from "@/lib/validation/listing";
 import { getListingForViewer } from "@/services/listing-service";
 import { ComingSoon } from "@/components/ui/coming-soon";
+import { ReportButton } from "@/components/products/report-button";
 import { MessageSellerButton } from "@/components/messages/message-seller-button";
 import { findBuyerConversationId } from "@/services/messaging-service";
 import { PurchaseRequestButton } from "@/components/purchase-request/purchase-request-button";
@@ -95,6 +96,7 @@ async function Listing({ params }: Props) {
       <p className="mt-10 max-w-[760px] border-l-8 border-black pl-4 text-sm font-bold">
         Meet in a busy campus spot, check the item before you pay, and keep payment between you and the seller. Campus Cart doesn&apos;t handle money.
       </p>
+      {!isOwner && p.status !== "REMOVED" && <ReportButton productId={p.id} signedIn={!!user} />}
     </article>
   );
 }

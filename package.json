@@ -13,6 +13,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
+    "admin:grant": "tsx scripts/grant-admin.ts grant",
+    "admin:revoke": "tsx scripts/grant-admin.ts revoke",
     "test": "tsx --conditions=react-server --test \"src/**/*.test.ts\""
   },
   "dependencies": {

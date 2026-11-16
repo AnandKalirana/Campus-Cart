@@ -23,3 +23,6 @@ export const inboxReadLimiter = createRateLimiter({ limit: 600, windowMs: 10 * 6
 export const profileNameLimiter = createRateLimiter({ limit: 10, windowMs: 60 * 60_000 });
 export const passwordChangeLimiter = createRateLimiter({ limit: 5, windowMs: 15 * 60_000 });
 export const resendVerificationLimiter = createRateLimiter({ limit: 3, windowMs: 60 * 60_000 });
+
+export const reportLimiter = createRateLimiter({ limit: 10, windowMs: 24 * 60 * 60_000 });
+export const adminActionLimiter = createRateLimiter({ limit: 120, windowMs: 10 * 60_000 });

@@ -13,6 +13,7 @@ export async function AccountMenu() {
         <span aria-hidden className="grid h-full w-10 place-items-center bg-cc-yellow font-raw text-lg">{first.charAt(0)}</span>
         <span className="sr-only">Signed in as {first}</span>
       </span>
+      {user.role === "ADMIN" && <Link href="/admin" className="bru-btn h-12 bg-cc-yellow px-4 text-base">Admin</Link>}
       <form action={logoutAction}><button type="submit" className="bru-btn h-12 bg-white px-4 text-base">Log out</button></form>
     </div>
   );
@@ -24,6 +25,7 @@ export async function MobileAccountLinks() {
   return user ? (
     <>
       <Link href="/dashboard" data-close className="block border-b-4 border-black py-3.5 font-raw text-xl">Dashboard</Link>
+      {user.role === "ADMIN" && <Link href="/admin" data-close className="block border-b-4 border-black py-3.5 font-raw text-xl">Admin</Link>}
       <form action={logoutAction}><button type="submit" className="w-full border-b-4 border-black py-3.5 text-left font-raw text-xl">Log out</button></form>
     </>
   ) : (

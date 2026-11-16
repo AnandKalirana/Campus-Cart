@@ -47,3 +47,14 @@ Point `TEST_DATABASE_URL` at a disposable database created with `prisma migrate 
 | Tests | Unit + DB integration tests. CI, security headers/CSP, shared rate limiter: not started. |
 
 The homepage shows clearly labelled **sample data** (`src/lib/catalog.ts`) only while there are no live listings. Dashboard, wishlist, messages and offers are live (Phase 5).
+
+## Admin and moderation (Phase 6)
+
+- **Create the first admin** (no web UI on purpose; needs database access and a verified account):
+  `DATABASE_URL=... npm run admin:grant -- person@campus.edu` (revoke: `npm run admin:revoke -- ...`). The person must log in again.
+- **`/admin`** (admins only; everyone else is redirected): overview, report queue, listing moderation (remove / restore), user suspension (also signs the user out), campus email-domain management, audit log.
+- **Defence in depth:** the page gate (`requireAdmin`), every server action (role check, rate limit, Zod) and every `admin-service` function (re-checks ADMIN + ACTIVE in the database) each verify the caller. Every change writes an `AuditLog` row in the same transaction.
+- **Students** can report a listing (`POST /api/reports`; 10 per day, one per listing, not their own). Removing a listing cancels its open offers and notifies the seller.
+- **Campus domains:** free mail providers and shared suffixes (`gmail.com`, `ac.in`, ...) are rejected and domains may not overlap another campus. This is a small denylist, not a full public-suffix check; review each campus domain by hand.
+- Admins cannot suspend themselves or other admins from the UI.
+- Migration `20261116120000_audit_log` adds the `AuditLog` table (run `npm run db:deploy`).
