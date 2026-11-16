@@ -1,8 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { auth } from "@/auth";
 import { db } from "@/lib/db";
 
 export interface CurrentUser { id: string; email: string; name: string; role: "STUDENT" | "ADMIN"; emailVerified: boolean; universityId: string | null }
@@ -13,6 +11,7 @@ export interface CurrentUser { id: string; email: string; name: string; role: "S
  */
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   await connection(); // per-request only: Auth.js uses crypto, which must not run during prerender
+  const { auth } = await import("@/auth"); // lazy: next-auth pulls in next/navigation, which unit tests of actor-based services must not load
   const session = await auth();
   const id = session?.user?.id;
   if (!id) return null;
@@ -24,12 +23,14 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
 export async function requireUser(next = "/"): Promise<CurrentUser> {
   const user = await getCurrentUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(next)}`);
-  return user;
+  if (user) return user;
+  // Imported lazily so modules that only need getCurrentUser (and their tests) don't load next/navigation.
+  const { redirect } = await import("next/navigation");
+  return redirect(`/login?next=${encodeURIComponent(next)}`);
 }
 
 export async function requireAdmin(): Promise<CurrentUser> {
   const user = await requireUser("/admin");
-  if (user.role !== "ADMIN") redirect("/");
+  if (user.role !== "ADMIN") (await import("next/navigation")).redirect("/");
   return user;
 }

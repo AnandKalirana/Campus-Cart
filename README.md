@@ -46,4 +46,4 @@ Point `TEST_DATABASE_URL` at a disposable database created with `prisma migrate 
 | Wishlist, messaging, purchase requests, admin | Not started (placeholder pages). |
 | Tests | Unit + DB integration tests. CI, security headers/CSP, shared rate limiter: not started. |
 
-The homepage shows clearly labelled **sample data** (`src/lib/catalog.ts`) only while there are no live listings. The dashboard overview is still sample data until Phase 5.
+The homepage shows clearly labelled **sample data** (`src/lib/catalog.ts`) only while there are no live listings. Dashboard, wishlist, messages and offers are live (Phase 5).

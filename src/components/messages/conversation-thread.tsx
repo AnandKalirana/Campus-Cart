@@ -18,6 +18,7 @@ export function ConversationThread({ initialConversation, initialMessages, nextC
   const [messages, setMessages] = useState(initialMessages);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextCursorRef, setNextCursorRef] = useState(nextCursor);
   const [hasMore, setHasMore] = useState(!!nextCursor);
@@ -69,25 +70,26 @@ export function ConversationThread({ initialConversation, initialMessages, nextC
     const trimmed = newMessage.trim();
     if (!trimmed || sending) return;
     setSending(true);
+    setSendError(null);
     try {
-      const res = await fetch(`/api/conversations/${conversation.productId}/messages`, {
+      const res = await fetch(`/api/conversations/${conversation.id}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ body: trimmed }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.ok && data.message) {
-          setMessages(prev => [...prev, data.message]);
-          setNewMessage("");
-        }
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.ok && data.message) {
+        setMessages(prev => [...prev, data.message]);
+        setNewMessage("");
+      } else {
+        setSendError(res.status === 429 ? "You're sending a lot of messages. Try again in a bit." : data?.message ?? "Couldn't send. Please try again.");
       }
     } catch {
-      // error handled by form
+      setSendError("Couldn't reach the server. Check your connection and try again.");
     } finally {
       setSending(false);
     }
-  }, [conversation.productId, newMessage, sending]);
+  }, [conversation.id, newMessage, sending]);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     if (e.currentTarget.scrollTop === 0 && hasMore && !loadingMore) {
@@ -134,7 +136,7 @@ export function ConversationThread({ initialConversation, initialMessages, nextC
           <ArrowLeft size={20} aria-hidden />
         </button>
         <div className="flex-1 min-w-0">
-          <Link href={`/products/${conversation.productId}`} className="font-raw text-sm truncate block hover:underline">{conversation.productTitle}</Link>
+          <h1 className="font-raw truncate text-sm"><Link href={`/products/${conversation.productId}`} className="hover:underline">{conversation.productTitle}</Link></h1>
           <p className="text-xs font-bold text-cc-muted">{formatINR(conversation.productPrice)} · {conversation.otherPartyName}</p>
         </div>
         <button type="button" className="bru-btn h-10 w-10 p-0 text-cc-muted hover:text-black" aria-label="More options">
@@ -188,6 +190,7 @@ export function ConversationThread({ initialConversation, initialMessages, nextC
       </div>
 
       <form onSubmit={handleSend} className="border-t-4 border-black bg-white p-3 md:p-4 shrink-0">
+        {sendError && <p role="alert" className="mb-2 border-2 border-black bg-cc-pink p-2 text-sm font-bold">{sendError}</p>}
         <div className="flex gap-2">
           <input
             type="text"
@@ -199,7 +202,7 @@ export function ConversationThread({ initialConversation, initialMessages, nextC
             maxLength={2000}
             aria-label="Message"
           />
-          <button type="submit" className="bru-btn h-12 bg-black px-4 text-white" disabled={sending || !newMessage.trim()}>
+          <button type="submit" aria-label="Send message" className="bru-btn h-12 bg-black px-4 text-white" disabled={sending || !newMessage.trim()}>
             <Send size={20} aria-hidden />
           </button>
         </div>

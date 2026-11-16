@@ -9,6 +9,8 @@ import { getCurrentUser } from "@/lib/session";
 import { idSchema } from "@/lib/validation/listing";
 import { getListingForViewer } from "@/services/listing-service";
 import { ComingSoon } from "@/components/ui/coming-soon";
+import { MessageSellerButton } from "@/components/messages/message-seller-button";
+import { findBuyerConversationId } from "@/services/messaging-service";
 import { PurchaseRequestButton } from "@/components/purchase-request/purchase-request-button";
 
 type Props = { params: Promise<{ id: string }> };
@@ -35,6 +37,7 @@ async function Listing({ params }: Props) {
   const hit = await getListingForViewer(id, user);
   if (!hit) notFound();
   const { listing: p, isOwner } = hit;
+  const threadId = user && !isOwner ? await findBuyerConversationId(user.id, p.id) : null;
   const sold = p.status === "SOLD";
   const hidden = p.status === "PAUSED";
   const next = encodeURIComponent(`/products/${p.id}`);
@@ -72,7 +75,12 @@ async function Listing({ params }: Props) {
             {isOwner ? (
               <Link href={`/sell/${p.id}/edit`} className="bru-btn h-14 bg-cc-orange px-8 text-xl">Edit listing</Link>
             ) : sold ? null : user ? (
-              <PurchaseRequestButton productId={p.id} productTitle={p.title} productPrice={p.price} />
+              <>
+                <PurchaseRequestButton productId={p.id} productTitle={p.title} productPrice={p.price} />
+                {threadId
+                  ? <Link href={`/messages/${threadId}`} className="bru-btn flex h-14 flex-1 items-center justify-center bg-white px-8 text-xl">Open chat</Link>
+                  : <MessageSellerButton productId={p.id} productTitle={p.title} sellerName={p.seller.name.split(" ")[0]} />}
+              </>
             ) : (
               <Link href={`/login?next=${next}`} className="bru-btn h-14 bg-black px-8 text-xl text-white">Log in to contact seller</Link>
             )}

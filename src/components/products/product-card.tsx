@@ -13,36 +13,38 @@ interface ProductCardProps {
   product: ListingCardData;
   demo?: boolean;
   headingLevel?: 2 | 3;
-  user?: { id: string; name: string; email: string; role: "STUDENT" | "ADMIN"; emailVerified: boolean; universityId: string | null } | null;
+  /** Resolved on the server from the session. Never trust it for authorization: the API re-checks. */
+  signedIn?: boolean;
+  initialSaved?: boolean;
 }
 
-export function ProductCard({ product: p, demo = false, headingLevel = 3, user = null }: ProductCardProps) {
+export function ProductCard({ product: p, demo = false, headingLevel = 3, signedIn = false, initialSaved = false }: ProductCardProps) {
   const H = `h${headingLevel}` as const;
-  const [prompt, setPrompt] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [notice, setNotice] = useState<null | "login" | "demo" | "error" | "busy">(null);
+  const [saved, setSaved] = useState(initialSaved);
   const [saving, setSaving] = useState(false);
 
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!user) {
-      setPrompt(true);
-      return;
-    }
+    if (demo) { setNotice("demo"); return; }
+    if (!signedIn) { setNotice("login"); return; }
     if (saving) return;
     setSaving(true);
+    setNotice(null);
     try {
       const res = await fetch("/api/wishlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: p.id }),
+        body: JSON.stringify({ productId: p.id, saved: !saved }),
       });
-      const data = await res.json();
-      if (data.ok) {
-        setSaved(!saved);
-      }
+      if (res.status === 401) { setNotice("login"); return; }
+      if (res.status === 429) { setNotice("busy"); return; }
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.ok) setSaved(Boolean(data.saved));
+      else setNotice("error");
     } catch {
-      // silent fail
+      setNotice("error");
     } finally {
       setSaving(false);
     }
@@ -72,18 +74,25 @@ export function ProductCard({ product: p, demo = false, headingLevel = 3, user =
           </div>
         </div>
       </Link>
-      <button type="button" aria-label={saved ? `Remove ${p.title} from wishlist` : `Save ${p.title} to wishlist`} aria-expanded={prompt} onClick={handleSave}
+      <button type="button" aria-label={`Save ${p.title} to wishlist`} aria-pressed={saved} aria-busy={saving} onClick={handleSave}
         className={`bru-btn absolute right-3 top-3 h-11 w-11 !shadow-[3px_3px_0_#000] transition-colors ${saved ? "bg-cc-pink !text-white hover:!bg-cc-pink/80" : "bg-white hover:!bg-black hover:!text-white"}`}>
         <Heart size={20} aria-hidden className={saved ? "fill-current" : ""} />
       </button>
       <AnimatePresence>
-        {prompt && (
+        {notice && (
           <motion.div role="status" initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.1, ease: "easeOut" }}
             className="bru-card absolute right-3 top-16 z-10 w-60 p-4">
-            <p className="font-raw text-base">Log in to save finds</p>
-            <p className="mt-1 text-sm font-bold">Your wishlist stays with your student account.</p>
-            <Link href="/login" className="bru-btn mt-3 h-10 bg-black px-4 text-sm text-white">Log in</Link>
+            {notice === "login" ? (
+              <>
+                <p className="font-raw text-base">Log in to save finds</p>
+                <p className="mt-1 text-sm font-bold">Your wishlist stays with your student account.</p>
+                <Link href="/login" className="bru-btn mt-3 h-10 bg-black px-4 text-sm text-white">Log in</Link>
+              </>
+            ) : (
+              <p className="text-sm font-bold">{notice === "demo" ? "Sample listings can't be saved." : notice === "busy" ? "Slow down a sec, then try again." : "Couldn't update your wishlist. Please try again."}</p>
+            )}
+            <button type="button" onClick={() => setNotice(null)} className="mt-2 text-sm font-bold underline decoration-2 underline-offset-4">Dismiss</button>
           </motion.div>
         )}
       </AnimatePresence>

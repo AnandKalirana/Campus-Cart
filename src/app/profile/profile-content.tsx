@@ -128,8 +128,8 @@ export function ProfileContent({ user }: ProfileContentProps) {
       setPasswordError("Enter your current password");
       return;
     }
-    if (newPassword.length < 8) {
-      setPasswordError("New password must be at least 8 characters");
+    if (newPassword.length < 10) {
+      setPasswordError("New password must be at least 10 characters");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -151,6 +151,9 @@ export function ProfileContent({ user }: ProfileContentProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message ?? "Failed to update password");
       setPasswordSuccess(true);
+      // The server ends every session on a password change (including this one), so send them to log in again.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload on purpose: the old session is dead
+      setTimeout(() => { window.location.assign("/login?next=%2Fprofile"); }, 2000);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -236,7 +239,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
 
       {/* Change Password */}
       <Section title="Password" description="Your current password is required to set a new one.">
-        {passwordSuccess && <SuccessToast message="Password updated successfully" />}
+        {passwordSuccess && <SuccessToast message="Password updated. Please log in again." />}
         <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-md">
           <FieldLabel htmlFor="currentPassword">Current password</FieldLabel>
           <InputWrapper error={passwordError}>
