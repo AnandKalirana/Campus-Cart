@@ -9,9 +9,12 @@ import { Marquee } from "@/components/layout/marquee";
 import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
   title: { default: "Campus Cart — Less spending. More living.", template: "%s · Campus Cart" },
   description:
     "Buy and sell pre-loved essentials with verified students nearby. Local pickup, zero shipping, free listings.",
+  openGraph: { type: "website", siteName: "Campus Cart", title: "Campus Cart — Less spending. More living.", description: "Buy and sell pre-loved essentials with verified students nearby." },
+  twitter: { card: "summary" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
