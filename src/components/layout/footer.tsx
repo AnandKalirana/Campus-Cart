@@ -11,7 +11,7 @@ async function Year() {
 
 // Only links to pages that exist. DROP_ZONES, AMBASSADORS and COOKIES from the draft have no page yet.
 const COMMUNITY: [string, string][] = [["SAFETY_HUB", "/safety"], ["HELP", "/help"], ["HOW_IT_WORKS", "/how-it-works"]];
-const BORING: [string, string][] = [["TERMS", "/terms"], ["PRIVACY", "/privacy"]];
+const BORING: [string, string][] = [["TERMS", "/terms"], ["PRIVACY", "/privacy"], ["COOKIES", "/cookies"]];
 
 export function Footer() {
   return (
