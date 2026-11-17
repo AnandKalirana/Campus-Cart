@@ -1,8 +1,11 @@
 /**
  * Grants or revokes the ADMIN role. There is deliberately no web UI for this: the first admin is created by someone with database access.
- *   DATABASE_URL=... npx tsx scripts/grant-admin.ts grant person@campus.edu
- *   DATABASE_URL=... npx tsx scripts/grant-admin.ts revoke person@campus.edu
+ *   npm run admin:grant -- person@campus.edu
+ *   npm run admin:revoke -- person@campus.edu
+ * DATABASE_URL is read from the environment or from .env.local (works on Windows PowerShell too).
  */
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 

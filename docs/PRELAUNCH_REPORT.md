@@ -26,7 +26,7 @@ No AI features exist. Sections of the standard that concern AI are not applicabl
 Responsive web only (checked at 375px for horizontal scroll). No native app; Android and iOS device testing not done.
 
 ## Deployment
-Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/workflows/ci.yml` and has not yet run on GitHub as of this writing.
+Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/workflows/ci.yml`; it ran green on GitHub for PR #18 (2026-11-17).
 
 ## Remaining risks (most important first)
 1. Rate limits and login throttling reset on restart and are not shared between instances.
@@ -40,8 +40,8 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 ## Launch checklist
 
 ### Security
-- [PASS] No secrets in source (worktree and full git history scanned locally on 2026-11-17; CI runs gitleaks, not yet run on GitHub)
-- [NOT TESTED] No secrets in Git history by an independent tool
+- [PASS] No secrets in source (worktree and full git history scanned locally on 2026-11-17; CI gitleaks job also passed on GitHub, 2026-11-17)
+- [PASS] No secrets in Git history by an independent tool (gitleaks, full history, CI run on PR #18)
 - [REQUIRES CONFIGURATION] HTTPS (HTTP to HTTPS redirect, HSTS header is set in production builds but unverified on a real domain)
 - [REQUIRES CONFIGURATION] Secure cookies (production flag set by Auth.js; verify on the real domain)
 - [PASS] Authentication (login, registration, verify, reset flows tested)
@@ -59,7 +59,7 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 - [NOT TESTED] Security headers on the deployed domain (securityheaders.com or similar)
 - [PASS] CORS: no cross-origin access is enabled; APIs reject foreign Origin on mutations
 - [PASS] Dependency audit (0 vulnerabilities in production deps on 2026-11-17)
-- [NOT TESTED] Secret scanning in CI (workflow written, not yet run)
+- [PASS] Secret scanning in CI (gitleaks job passed on PR #18)
 - [PASS] Error sanitization (generic bodies, request ids)
 - [NOT TESTED] Logging review on real traffic
 - [PASS] Database security: constraints, FKs, parameterised access (no Supabase RLS; not used)
@@ -111,7 +111,7 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 
 ### DevOps
 - [NOT TESTED] Environment separation (documented, not set up)
-- [NOT TESTED] CI checks (workflow written, not yet run)
+- [PASS] CI checks (prisma validate, migrate deploy, drift check, typecheck, lint, 53 tests, build, npm audit all green on PR #18)
 - [PASS] Build passes locally; tests pass locally
 - [PASS] Deployment documented
 - [REQUIRES CONFIGURATION] Monitoring and alerting
