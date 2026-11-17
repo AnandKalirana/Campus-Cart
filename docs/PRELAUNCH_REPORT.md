@@ -30,7 +30,7 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 
 ## Remaining risks (most important first)
 1. Rate limits and login throttling reset on restart and are not shared between instances.
-2. Production email is not wired: verification and reset emails cannot be sent.
+2. Production email: provider drivers (Resend, Brevo) are implemented and unit-tested against a fake `fetch`, but no real email has been sent. Needs a provider account, a verified sender, and the env vars in `docs/DEPLOYMENT.md`.
 3. Real photo upload to Neon object storage has not been run end to end; the Neon database password was shared in chat and must be rotated.
 4. No account deletion / data export; legal pages are drafts with placeholders.
 5. No performance, screen-reader (human), Lighthouse or cross-browser testing; no monitoring or backup restore drill.
@@ -106,7 +106,7 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 - [PASS] Marketplace, listing create/edit/status, photos, wishlist, messaging, offers, reports, admin
 - [PASS] Loading, empty and error states on tested flows
 - [PASS] Custom 404 and global error pages
-- [NOT TESTED] Email flows end to end (no provider)
+- [REQUIRES CONFIGURATION] Email flows end to end (drivers tested with a fake provider; no real delivery tested)
 - [NOT TESTED] Real Neon storage upload
 
 ### DevOps

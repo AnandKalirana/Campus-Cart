@@ -134,3 +134,18 @@ test("password reset request: a newer token invalidates the older one", run, asy
   assert.equal(await svc.resetPassword(tokenFrom(mails[0]), "first-attempt-password-5"), false);
   assert.equal(await svc.resetPassword(tokenFrom(mails[1]), "second-attempt-password-6"), true);
 });
+
+test("signup and password reset answer normally when the mail provider fails", run, async () => {
+  const prev = process.env.NODE_ENV;
+  (process.env as Record<string, string>).NODE_ENV = "production";
+  const errs: string[] = []; const realErr = console.error; console.error = (m: string) => { errs.push(String(m)); };
+  try {
+    const email = `${tag}-mailfail@campus.test`;
+    const r = await svc.registerStudent(reg({ email }));
+    assert.equal(r.ok, true);
+    assert.ok(await db().user.findUnique({ where: { email } }), "account is kept so the user can resend");
+    await svc.requestPasswordReset(email); // must not throw
+    assert.ok(errs.some(l => l.includes("mail_failed")));
+    assert.ok(!errs.join("").includes(email), "logs must not contain the address");
+  } finally { console.error = realErr; (process.env as Record<string, string>).NODE_ENV = prev ?? "test"; }
+});
