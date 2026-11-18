@@ -4,7 +4,7 @@ import { env } from "@/lib/env";
 import { burnPasswordCheck, hashPassword, verifyPassword } from "@/lib/auth/password";
 import { generateToken, hashToken } from "@/lib/auth/tokens";
 import { emailMatchesDomains, normalizeEmail } from "@/lib/auth/email-domain";
-import { sendMail } from "@/services/mailer";
+import { sendMail, trySendMail } from "@/services/mailer";
 import type { RegisterInput } from "@/lib/validation/auth";
 
 const VERIFY_TTL_MS = 24 * 60 * 60 * 1000;
@@ -52,11 +52,12 @@ export async function registerStudent(input: RegisterInput): Promise<RegisterRes
     throw e;
   }
   const token = await issueToken(userId, "EMAIL_VERIFY", VERIFY_TTL_MS);
-  await sendMail({
+  // A provider outage must not change the response (no enumeration) or lose the account: the user can resend.
+  await trySendMail({
     to: email,
     subject: "Verify your Campus Cart email",
     text: `Welcome to Campus Cart.\n\nVerify your email: ${env().APP_URL}/verify-email?token=${token}\n\nThis link expires in 24 hours. If you didn't sign up, ignore this email.`,
-  });
+  }, "signup_verify");
   return { ok: true };
 }
 
@@ -90,11 +91,11 @@ export async function requestPasswordReset(emailRaw: string): Promise<void> {
   const user = await db().user.findUnique({ where: { email }, select: { id: true, status: true } });
   if (!user || user.status !== "ACTIVE") return;
   const token = await issueToken(user.id, "PASSWORD_RESET", RESET_TTL_MS);
-  await sendMail({
+  await trySendMail({
     to: email,
     subject: "Reset your Campus Cart password",
     text: `Reset your password: ${env().APP_URL}/reset-password?token=${token}\n\nThis link expires in 1 hour. If you didn't ask for this, ignore this email.`,
-  });
+  }, "password_reset");
 }
 
 export async function resetPassword(token: string, newPassword: string): Promise<boolean> {

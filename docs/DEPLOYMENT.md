@@ -12,7 +12,7 @@ Keep separate Neon branches / databases and separate secrets for development, st
 | `AUTH_URL` or `AUTH_TRUST_HOST=true` | yes when not on Vercel | public https URL |
 | `APP_URL` | yes | https URL used in emailed links, sitemap and robots |
 | `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `STORAGE_BUCKET` | yes | photo storage; without them uploads return 503 in production |
-| email provider settings | yes | the production mailer intentionally throws until one is wired in |
+| `MAIL_DRIVER`, `MAIL_FROM`, `RESEND_API_KEY` or `BREVO_API_KEY` | yes | `MAIL_DRIVER=resend` or `brevo`. `MAIL_FROM` must be a sender/domain verified at the provider. With the default `log` driver, production refuses to send (sign-up still works, mails are not delivered, errors are logged as `mail_failed`) |
 
 ## First deploy checklist
 1. `npm run db:deploy` against the new database; confirm `prisma migrate status` is clean.
