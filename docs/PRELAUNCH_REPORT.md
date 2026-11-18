@@ -11,7 +11,7 @@ Next.js 16 (App Router, Turbopack, `cacheComponents`), React 19, TypeScript, Tai
 See `docs/SECURITY.md` and `docs/THREAT_MODEL.md`. Biggest open items: per-instance rate limiter, no bot protection, no MFA, production mailer, CSP allows inline scripts, no external review.
 
 ## Privacy
-Data collected is described in the draft Privacy Policy (placeholders to fill). No analytics, no ad trackers, no AI providers, only essential cookies. Account self-deletion and data export are not built. Log and backup retention periods are undefined.
+Data collected is described in the draft Privacy Policy (placeholders to fill). No analytics, no ad trackers, no AI providers, only essential cookies. Self-service account deletion and JSON data export are built (profile page). Deletion cascades to listings, chats (including the other student's copy) and offers; backups are not purged on deletion. Log and backup retention periods are undefined.
 
 ## Performance
 No Lighthouse, Core Web Vitals, bundle or database query measurements have been taken. Do not claim any performance result.
@@ -32,7 +32,7 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 1. Rate limits and login throttling reset on restart and are not shared between instances.
 2. Production email: provider drivers (Resend, Brevo) are implemented and unit-tested against a fake `fetch`, but no real email has been sent. Needs a provider account, a verified sender, and the env vars in `docs/DEPLOYMENT.md`.
 3. Real photo upload to Neon object storage has not been run end to end; the Neon database password was shared in chat and must be rotated.
-4. No account deletion / data export; legal pages are drafts with placeholders.
+4. Legal pages are drafts with placeholders; backup retention after deletion is undefined.
 5. No performance, screen-reader (human), Lighthouse or cross-browser testing; no monitoring or backup restore drill.
 6. No bot protection on signup; messaging and offers do not require a verified email.
 7. Streamed pages return HTTP 200 for not-found content (framework behaviour with `cacheComponents`).
@@ -74,7 +74,7 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 - [FAIL] Data retention defined (log, backup and inactive-account periods are placeholders)
 - [PASS] Third-party AI data handling: no AI providers used
 - [PASS] Analytics privacy: no analytics
-- [FAIL] Account / data deletion (not built)
+- [PASS] Account / data deletion and export (integration tests + real-browser run on a throwaway local account; not tested against Neon, not legally reviewed)
 
 ### Performance
 - [NOT TESTED] Lighthouse

@@ -22,7 +22,7 @@ Authorization (IDOR on threads, offers, listings; admin pages and operations), s
 - Rate limiting across several server instances (needs a shared store).
 - Real email delivery, real object storage upload against Neon, real HTTPS (HSTS, Secure cookies) on a deployed domain.
 - CSP uses `'unsafe-inline'` for scripts and styles (Next.js inline bootstrap); a nonce-based policy was not attempted.
-- Bot protection on signup, MFA, breached-password checks, account deletion and data export, cookie consent (not needed while only essential cookies are set).
+- Bot protection on signup, MFA, breached-password checks, cookie consent (not needed while only essential cookies are set).
 - Screen-reader testing by a person; Lighthouse / Core Web Vitals measurements.
 
 ## Reporting a vulnerability

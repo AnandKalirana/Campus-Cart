@@ -23,3 +23,10 @@ test("rate limiter: blocks after the limit, keys are independent, window resets"
   t = 1001;
   assert.equal(rl.check("a").ok, true);
 });
+
+test("account data limiters exist with strict limits", async () => {
+  const g = await import("./request-guards");
+  assert.equal(g.accountExportLimiter.check("u").ok, true);
+  for (let i = 0; i < 5; i++) g.accountDeleteLimiter.check("v");
+  assert.equal(g.accountDeleteLimiter.check("v").ok, false); // 6th delete attempt in the window is blocked
+});

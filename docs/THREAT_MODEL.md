@@ -29,3 +29,13 @@ Actors: anonymous visitors, malicious students, a student with a stolen session,
 | Moderation abuse / false reports | one report per user per listing, 10 per day; reporter identity hidden from sellers; every action audited with a reason | integration tests | no appeal process |
 | Data leakage between campuses | listing queries scoped by visibility rules; email domain decides campus at registration | tests for domain matching and overlap | not tested with several real campuses |
 | Hosting cost abuse | upload, listing and message limits; image size caps | limits tested | no spend alerts configured |
+
+## Account deletion and export (Phase 7b)
+| Threat | Mitigation | Tested | Residual |
+|---|---|---|---|
+| Stolen session wipes the account | delete re-checks the password; 5 attempts / 15 min / user; typed `DELETE` confirmation; confirmation email sent to the owner afterwards | integration tests (wrong/empty password, no-password account, admin) | the email only helps if the mailbox is not also compromised |
+| Export leaks another person's data (BOLA) | the user id comes from the session only (no id parameter); export excludes password hash, session version, tokens and other students' name/email | integration tests | the other student's message text appears in the exporter's own chat history by design |
+| Export abuse / large response | 3 / hour / user; hard caps per section with a `truncated` flag | cap logic not load-tested | none known |
+| Accidental loss of the last admin | admin accounts cannot self-delete | integration test | admins must be demoted by another admin first |
+| Orphaned photos after delete | blobs deleted after the row; failures logged (`photosFailed`), never block the user | test with a failing store | orphan blobs stay until cleaned up manually |
+| Data lingering | backups are not purged on deletion | not tested | backup retention period undefined (placeholder) |

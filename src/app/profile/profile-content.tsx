@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Mail, User, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
+import { Mail, User, Eye, EyeOff, CheckCircle, AlertCircle, Download } from "lucide-react";
 
 interface User {
   id: string;
@@ -161,6 +161,35 @@ export function ProfileContent({ user }: ProfileContentProps) {
       setPasswordError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setPasswordLoading(false);
+    }
+  };
+
+  // Delete account state
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const handleDeleteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDeleteError("");
+    if (!deletePassword) { setDeleteError("Enter your password"); return; }
+    if (deleteConfirm !== "DELETE") { setDeleteError("Type DELETE in capital letters to confirm"); return; }
+    setDeleteLoading(true);
+    try {
+      const res = await fetch("/api/account/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: deletePassword, confirm: deleteConfirm }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message ?? "We couldn't delete your account. Nothing was deleted. Please try again.");
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload on purpose: the session no longer exists
+      window.location.assign("/");
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Something went wrong. Nothing was deleted.");
+      setDeleteLoading(false);
     }
   };
 
@@ -345,22 +374,52 @@ export function ProfileContent({ user }: ProfileContentProps) {
         )}
       </Section>
 
+      {/* Your data */}
+      <Section title="Your data" description="Download a copy of everything we hold about you.">
+        <p className="mb-4 max-w-md font-bold">A JSON file with your profile, listings, saved items, chats, offers and reports. Photos and other students&apos; names and emails are not included.</p>
+        <a href="/api/account/export" download className="bru-btn inline-flex h-12 items-center gap-2 bg-cc-sky px-6 text-base">
+          <Download size={18} aria-hidden /> Download my data
+        </a>
+      </Section>
+
       {/* Danger Zone */}
       <Section title="Danger zone" description="Irreversible actions.">
         <div className="bru-card border-4 border-cc-pink bg-white p-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="font-raw text-lg">Delete account</p>
-              <p className="text-sm font-bold text-cc-muted">Permanently remove your account, listings, and messages. This cannot be undone.</p>
-            </div>
-            <button
-              type="button"
-              className="bru-btn h-12 bg-cc-pink px-6 text-base text-white self-start"
-              disabled
-            >
-              Delete account (soon)
+          <p className="font-raw text-lg">Delete account</p>
+          <p className="mt-1 max-w-xl text-sm font-bold text-cc-muted">
+            Permanently removes your account, listings, photos, saved items, offers and chats. Chats with other students disappear for them too. This cannot be undone, so download your data first if you want a copy.
+          </p>
+          {user.role === "ADMIN" ? (
+            <p className="mt-4 border-2 border-black bg-cc-yellow px-4 py-3 font-bold" role="note">Admin accounts can&apos;t be deleted here. Ask another admin to remove your admin role first.</p>
+          ) : !deleteOpen ? (
+            <button type="button" onClick={() => setDeleteOpen(true)} className="bru-btn mt-4 h-12 bg-cc-pink px-6 text-base text-black">
+              Delete my account…
             </button>
-          </div>
+          ) : (
+            <form onSubmit={handleDeleteSubmit} className="mt-4 max-w-md space-y-4" aria-describedby={deleteError ? "delete-error" : undefined}>
+              <div>
+                <FieldLabel htmlFor="deletePassword">Your password</FieldLabel>
+                <input id="deletePassword" type="password" value={deletePassword} onChange={e => { setDeletePassword(e.target.value); setDeleteError(""); }} className="bru-input w-full" disabled={deleteLoading} autoComplete="current-password" required />
+              </div>
+              <div>
+                <FieldLabel htmlFor="deleteConfirm">Type DELETE to confirm</FieldLabel>
+                <input id="deleteConfirm" type="text" value={deleteConfirm} onChange={e => { setDeleteConfirm(e.target.value); setDeleteError(""); }} className="bru-input w-full" disabled={deleteLoading} autoComplete="off" autoCapitalize="characters" spellCheck={false} required />
+              </div>
+              {deleteError && (
+                <p id="delete-error" className="flex items-center gap-1.5 text-sm font-bold text-red-700" role="alert">
+                  <AlertCircle size={14} aria-hidden /> {deleteError}
+                </p>
+              )}
+              <div className="flex flex-wrap gap-3">
+                <button type="submit" className="bru-btn h-12 bg-black px-6 text-base text-white" disabled={deleteLoading}>
+                  {deleteLoading ? "Deleting…" : "Permanently delete my account"}
+                </button>
+                <button type="button" onClick={() => { setDeleteOpen(false); setDeletePassword(""); setDeleteConfirm(""); setDeleteError(""); }} className="bru-btn h-12 bg-white px-6 text-base" disabled={deleteLoading}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </Section>
 
