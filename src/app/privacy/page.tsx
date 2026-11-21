@@ -33,7 +33,7 @@ export default function Page() {
       </section>
       <section>
         <h2>Service providers</h2>
-        <p>We use [HOSTING PROVIDER] for hosting, Neon for the database, [OBJECT STORAGE PROVIDER] for photos and [EMAIL PROVIDER] to send verification and reset emails. They process data on our behalf. We do not sell your data and we do not send your data to any AI provider.</p>
+        <p>We use [HOSTING PROVIDER] for hosting, Neon for the database, [OBJECT STORAGE PROVIDER] for photos and [EMAIL PROVIDER] to send verification and reset emails. They process data on our behalf. On the log-in and sign-up pages we also load Cloudflare Turnstile, a bot check run by Cloudflare. Your browser contacts Cloudflare directly, so Cloudflare receives your IP address and browser signals needed to tell people from bots. [REVIEW Cloudflare&rsquo;s current Turnstile data-processing terms and whether it stores anything in your browser before publishing.] We do not sell your data and we do not send your data to any AI provider.</p>
       </section>
       <section>
         <h2>Keeping and deleting data</h2>

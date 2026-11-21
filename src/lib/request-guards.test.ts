@@ -24,9 +24,17 @@ test("rate limiter: blocks after the limit, keys are independent, window resets"
   assert.equal(rl.check("a").ok, true);
 });
 
-test("account data limiters exist with strict limits", async () => {
-  const g = await import("./request-guards");
-  assert.equal(g.accountExportLimiter.check("u").ok, true);
-  for (let i = 0; i < 5; i++) g.accountDeleteLimiter.check("v");
-  assert.equal(g.accountDeleteLimiter.check("v").ok, false); // 6th delete attempt in the window is blocked
+test("account data limiters block after their limit (6th delete attempt, 4th export)", async () => {
+  process.env.AUTH_SECRET ??= "x".repeat(40);
+  const { createMemoryStore } = await import("./rate-limit/memory-store");
+  const { __setDefaultStoreForTests } = await import("./rate-limit/shared-limiter");
+  __setDefaultStoreForTests(createMemoryStore());
+  try {
+    const g = await import("./request-guards");
+    const del: boolean[] = []; for (let i = 0; i < 6; i++) del.push((await g.accountDeleteLimiter.check("v")).ok);
+    assert.deepEqual(del, [true, true, true, true, true, false]);
+    const exp: boolean[] = []; for (let i = 0; i < 4; i++) exp.push((await g.accountExportLimiter.check("v")).ok);
+    assert.deepEqual(exp, [true, true, true, false]);
+    assert.equal((await g.accountDeleteLimiter.check("someone-else")).ok, true, "per user");
+  } finally { __setDefaultStoreForTests(undefined); }
 });

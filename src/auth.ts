@@ -1,34 +1,34 @@
-import NextAuth, { type DefaultSession } from "next-auth";
+import NextAuth, { CredentialsSignin, type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { loginSchema } from "@/lib/validation/auth";
-import { createRateLimiter } from "@/lib/auth/rate-limit";
+import { clientIpFrom, guardLogin, loginSucceeded } from "@/lib/auth/abuse-guard";
 import { authenticate } from "@/services/auth-service";
 
 declare module "next-auth" {
   interface Session { user: { id: string; role: "STUDENT" | "ADMIN"; sv: number } & DefaultSession["user"] }
 }
 
-// 10 attempts / 15 min per (ip + email), and 30 / 15 min per ip. Per-instance: see rate-limit.ts.
-const perAccount = createRateLimiter({ limit: 10, windowMs: 15 * 60_000 });
-const perIp = createRateLimiter({ limit: 30, windowMs: 15 * 60_000 });
-
-function clientIp(req: Request): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-}
+/** Distinct codes let the login action show the right message without revealing anything about the account. */
+export class RateLimitedSignin extends CredentialsSignin { code = "rate_limited"; }
+export class CaptchaSignin extends CredentialsSignin { code = "captcha_failed"; }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60 },
   pages: { signIn: "/login" },
   providers: [
     Credentials({
-      credentials: { email: {}, password: {} },
+      credentials: { email: {}, password: {}, turnstile: {} },
       async authorize(raw, request) {
         const parsed = loginSchema.safeParse(raw);
         if (!parsed.success) return null;
-        const ip = clientIp(request);
-        if (!perIp.check(ip).ok || !perAccount.check(`${ip}:${parsed.data.email}`).ok) return null;
+        // Enforced HERE, not only in the form action: Auth.js also exposes /api/auth/callback/credentials, which a bot could
+        // call directly. Whatever the entry point, the IP limit, Turnstile and the per-account limit all run before any password check.
+        const token = typeof raw?.turnstile === "string" ? raw.turnstile : undefined;
+        const guard = await guardLogin({ ip: clientIpFrom(request.headers), email: parsed.data.email, token });
+        if (!guard.ok) throw guard.reason === "captcha" ? new CaptchaSignin() : new RateLimitedSignin();
         const user = await authenticate(parsed.data.email, parsed.data.password);
         if (!user) return null;
+        await loginSucceeded(parsed.data.email);
         return { id: user.id, email: user.email, name: user.name, role: user.role, sv: user.sessionVersion } as never;
       },
     }),

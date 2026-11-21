@@ -5,7 +5,7 @@ import { getCurrentUser, type CurrentUser } from "@/lib/session";
 import { isSameOrigin } from "@/lib/request-guards";
 import { log, requestId } from "@/lib/log";
 
-type Limiter = { check(key: string): { ok: boolean; retryAfterSec: number } };
+type Limiter = { check(key: string): { ok: boolean; retryAfterSec: number } | Promise<{ ok: boolean; retryAfterSec: number }> };
 
 export const MAX_JSON_BYTES = 16 * 1024;
 
@@ -23,7 +23,7 @@ async function authAndLimit(req: Request, limiter: Limiter, opts: { mutating: bo
   if (opts.mutating && !isSameOrigin(req)) return { fail: ctx.json({ ok: false, code: "blocked", message: "Request blocked." }, 403) };
   const user = await getCurrentUser();
   if (!user) return { fail: ctx.json({ ok: false, code: "unauthorized", message: "Please log in again." }, 401) };
-  const rl = limiter.check(user.id);
+  const rl = await limiter.check(user.id);
   if (!rl.ok) {
     log("warn", "rate_limited", { rid: ctx.rid, uid: user.id });
     return { fail: ctx.json({ ok: false, code: "rate_limited", message: "Too many requests. Please slow down and try again shortly." }, 429, { "retry-after": String(rl.retryAfterSec) }) };

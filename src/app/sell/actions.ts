@@ -20,7 +20,7 @@ export async function createListingAction(_prev: ListingState | undefined, fd: F
   const raw = pick(fd);
   const parsed = listingInputSchema.safeParse(raw);
   if (!parsed.success) return { errors: fieldErrors(parsed.error.issues), values: raw };
-  if (!createListingLimiter.check(user.id).ok) return { ...TOO_MANY, values: raw };
+  if (!(await createListingLimiter.check(user.id)).ok) return { ...TOO_MANY, values: raw };
   try {
     const r = await createListing(user, parsed.data);
     if (!r.ok) return r.field ? { errors: { [r.field]: r.message }, values: raw } : { message: r.message, values: raw };

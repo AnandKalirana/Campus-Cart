@@ -8,7 +8,7 @@ Legend: `[PASS]` verified · `[FAIL]` known gap · `[NOT TESTED]` exists or is a
 Next.js 16 (App Router, Turbopack, `cacheComponents`), React 19, TypeScript, Tailwind 4. Prisma 7 + PostgreSQL (Neon). Auth.js v5. Photos in S3-compatible storage (local disk in development). Layers: UI, then route handlers and server actions (auth, same-origin, rate limit, Zod), then services (authorization and business rules), then Prisma. No payments; purchase requests only.
 
 ## Security
-See `docs/SECURITY.md` and `docs/THREAT_MODEL.md`. Biggest open items: per-instance rate limiter, no bot protection, no MFA, production mailer, CSP allows inline scripts, no external review.
+See `docs/SECURITY.md` and `docs/THREAT_MODEL.md`. Biggest open items: Turnstile and the shared limiter are untested against real Cloudflare and Neon, no MFA, production mailer, CSP allows inline scripts, no external review.
 
 ## Privacy
 Data collected is described in the draft Privacy Policy (placeholders to fill). No analytics, no ad trackers, no AI providers, only essential cookies. Self-service account deletion and JSON data export are built (profile page). Deletion cascades to listings, chats (including the other student's copy) and offers; backups are not purged on deletion. Log and backup retention periods are undefined.
@@ -29,12 +29,12 @@ Responsive web only (checked at 375px for horizontal scroll). No native app; And
 Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/workflows/ci.yml`; it ran green on GitHub for PR #18 (2026-11-17).
 
 ## Remaining risks (most important first)
-1. Rate limits and login throttling reset on restart and are not shared between instances.
+1. Login, sign-up, email-sending and destructive actions use a Postgres-backed shared limiter (see `docs/RATE_LIMITING.md`). High-frequency throttles (polling, wishlist, uploads, admin) are still per instance. Not load-tested on Neon.
 2. Production email: provider drivers (Resend, Brevo) are implemented and unit-tested against a fake `fetch`, but no real email has been sent. Needs a provider account, a verified sender, and the env vars in `docs/DEPLOYMENT.md`.
 3. Real photo upload to Neon object storage has not been run end to end; the Neon database password was shared in chat and must be rotated.
 4. Legal pages are drafts with placeholders; backup retention after deletion is undefined.
 5. No performance, screen-reader (human), Lighthouse or cross-browser testing; no monitoring or backup restore drill.
-6. No bot protection on signup; messaging and offers do not require a verified email.
+6. Turnstile guards login and sign-up only (forgot-password has limits but no challenge). Needs real Cloudflare keys; production fails closed without them. Messaging and offers do not require a verified email.
 7. Streamed pages return HTTP 200 for not-found content (framework behaviour with `cacheComponents`).
 
 ## Launch checklist
@@ -53,8 +53,8 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 - [PASS] SQL injection protection (parameterised queries only)
 - [PASS] SSRF: not applicable (no user-supplied URL fetching)
 - [PASS] Rate limiting present on all mutating endpoints
-- [FAIL] Rate limiting is shared across instances
-- [FAIL] Bot protection (none)
+- [PASS] Rate limiting shared across instances for login, sign-up, email-sending and destructive actions (atomic Postgres upsert; 100-way concurrency and two-instance tests on a local Postgres 16; NOT tested on Neon or under real Vercel traffic). Polling/wishlist/upload/admin limits remain per instance
+- [REQUIRES CONFIGURATION] Bot protection: Turnstile on login and sign-up, enforced server-side including the public Auth.js endpoint; fail-closed behaviour and bypass attempts tested with a fake verifier; real Cloudflare keys and a real-widget test still needed
 - [PASS] Security headers present on the built app
 - [NOT TESTED] Security headers on the deployed domain (securityheaders.com or similar)
 - [PASS] CORS: no cross-origin access is enabled; APIs reject foreign Origin on mutations
