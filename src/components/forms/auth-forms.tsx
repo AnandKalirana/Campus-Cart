@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { forgotPasswordAction, loginAction, registerAction, resetPasswordAction } from "@/app/(auth)/actions";
 import type { FormState } from "@/lib/auth/actions-helpers";
 import { Field, FormMessage, SubmitButton } from "./field";
+import { TurnstileField } from "./turnstile";
 
 const init: FormState = {};
 
@@ -15,6 +16,7 @@ export function LoginForm({ next }: { next: string }) {
       <FormMessage message={s.message} />
       <Field label="College email" name="email" type="email" autoComplete="email" defaultValue={s.values?.email} />
       <Field label="Password" name="password" type="password" autoComplete="current-password" />
+      <TurnstileField resetKey={s} />
       <SubmitButton pending={pending}>Log in</SubmitButton>
       <p className="text-center text-sm"><Link href="/forgot-password" className="font-bold underline underline-offset-4 decoration-2 hover:bg-black hover:text-white">Forgot your password?</Link></p>
     </form>
@@ -40,6 +42,7 @@ export function RegisterForm({ campuses }: { campuses: { id: string; name: strin
       </div>
       <Field label="College email" name="email" type="email" autoComplete="email" error={e.email} defaultValue={s.values?.email} hint="Must match your campus's email domain." />
       <Field label="Password" name="password" type="password" autoComplete="new-password" error={e.password} hint="At least 10 characters." />
+      <TurnstileField resetKey={s} />
       <SubmitButton pending={pending}>Create account</SubmitButton>
     </form>
   );

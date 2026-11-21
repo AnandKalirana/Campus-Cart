@@ -4,7 +4,8 @@ import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/auth";
 import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from "@/lib/validation/auth";
 import { safeNextPath } from "@/lib/auth/safe-next";
-import { FormState, GENERIC_ERROR, TOO_MANY, fieldErrors, forgotLimiter, ipFromHeaders, registerLimiter, resetLimiter, verifyLimiter } from "@/lib/auth/actions-helpers";
+import { CAPTCHA_FAILED, FormState, GENERIC_ERROR, TOO_MANY, fieldErrors, ipFromHeaders, tooManyIn } from "@/lib/auth/actions-helpers";
+import { guardForgot, guardSignup, limiters } from "@/lib/auth/abuse-guard";
 import { registerStudent, requestPasswordReset, resetPassword, verifyEmailToken } from "@/services/auth-service";
 import { tokenSchema } from "@/lib/validation/auth";
 
@@ -15,7 +16,8 @@ export async function registerAction(_: FormState, fd: FormData): Promise<FormSt
   const parsed = registerSchema.safeParse({ name: str(fd, "name"), email: str(fd, "email"), password: str(fd, "password"), universityId: str(fd, "universityId") });
   const values = { name: str(fd, "name"), email: str(fd, "email"), universityId: str(fd, "universityId") };
   if (!parsed.success) return { errors: fieldErrors(parsed.error.issues), values };
-  if (!registerLimiter.check(await ipFromHeaders()).ok) return { ...TOO_MANY, values };
+  const guard = await guardSignup({ ip: await ipFromHeaders(), email: parsed.data.email, token: str(fd, "cf-turnstile-response") });
+  if (!guard.ok) return { ...(guard.reason === "captcha" ? CAPTCHA_FAILED : tooManyIn(guard.retryAfterSec)), values };
   try {
     const r = await registerStudent(parsed.data);
     if (!r.ok) return { errors: { [r.field]: r.message }, values };
@@ -32,8 +34,14 @@ export async function loginAction(_: FormState, fd: FormData): Promise<FormState
   if (!parsed.success) return { message: "Enter your email and password.", values };
   const next = safeNextPath(str(fd, "next"));
   try {
-    await signIn("credentials", { email: parsed.data.email, password: parsed.data.password, redirect: false });
+    await signIn("credentials", { email: parsed.data.email, password: parsed.data.password, turnstile: str(fd, "cf-turnstile-response"), redirect: false });
   } catch (e) {
+    // Limit/captcha refusals are raised by authorize() with their own codes; everything else is a plain credential failure.
+    if (e instanceof AuthError && e.type === "CredentialsSignin") {
+      const code = (e as { code?: string }).code;
+      if (code === "rate_limited") return { message: "Too many attempts. Please wait a few minutes and try again.", values };
+      if (code === "captcha_failed") return { ...CAPTCHA_FAILED, values };
+    }
     if (e instanceof AuthError) return { message: "That email and password don't match, or the account can't sign in right now.", values };
     console.error("login failed", e instanceof Error ? e.message : "unknown");
     return { ...GENERIC_ERROR, values };
@@ -49,7 +57,8 @@ export async function forgotPasswordAction(_: FormState, fd: FormData): Promise<
   const parsed = forgotPasswordSchema.safeParse({ email: str(fd, "email") });
   const values = { email: str(fd, "email") };
   if (!parsed.success) return { errors: fieldErrors(parsed.error.issues), values };
-  if (!forgotLimiter.check(await ipFromHeaders()).ok) return { ...TOO_MANY, values };
+  const guard = await guardForgot({ ip: await ipFromHeaders(), email: parsed.data.email });
+  if (!guard.ok) return { ...tooManyIn(guard.retryAfterSec), values };
   try { await requestPasswordReset(parsed.data.email); } catch (e) { console.error("reset request failed", e instanceof Error ? e.message : "unknown"); }
   // Same answer whether or not the account exists.
   return { ok: true, message: "If that email has an account, a reset link is on its way. It expires in 1 hour." };
@@ -58,7 +67,7 @@ export async function forgotPasswordAction(_: FormState, fd: FormData): Promise<
 export async function resetPasswordAction(_: FormState, fd: FormData): Promise<FormState> {
   const parsed = resetPasswordSchema.safeParse({ token: str(fd, "token"), password: str(fd, "password") });
   if (!parsed.success) return { errors: fieldErrors(parsed.error.issues) };
-  if (!resetLimiter.check(await ipFromHeaders()).ok) return TOO_MANY;
+  if (!(await limiters.resetIp.check(await ipFromHeaders())).ok) return TOO_MANY;
   try {
     const ok = await resetPassword(parsed.data.token, parsed.data.password);
     if (!ok) return { message: "This reset link is invalid or has expired. Request a new one." };
@@ -72,7 +81,7 @@ export async function resetPasswordAction(_: FormState, fd: FormData): Promise<F
 export async function verifyEmailAction(_: FormState, fd: FormData): Promise<FormState> {
   const parsed = tokenSchema.safeParse({ token: str(fd, "token") });
   if (!parsed.success) return { message: "This verification link is invalid." };
-  if (!verifyLimiter.check(await ipFromHeaders()).ok) return TOO_MANY;
+  if (!(await limiters.verifyIp.check(await ipFromHeaders())).ok) return TOO_MANY;
   try {
     const ok = await verifyEmailToken(parsed.data.token);
     return ok ? { ok: true, message: "Email verified. You can now list items and message sellers." } : { message: "This verification link is invalid or has expired." };

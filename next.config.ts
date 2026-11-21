@@ -4,14 +4,15 @@ const isProd = process.env.NODE_ENV === "production";
 
 // Content-Security-Policy. Next.js injects small inline bootstrap scripts, so script-src needs 'unsafe-inline'
 // (a per-request nonce would force every page to render dynamically and defeat cacheComponents). Everything else is locked down:
-// no plugins, no framing, no foreign form targets, no third-party origins. 'unsafe-eval' is only added in development (React refresh).
+// no plugins, no framing, no foreign form targets. The ONLY third-party origin is Cloudflare Turnstile (challenges.cloudflare.com), needed for the bot check on login and signup. 'unsafe-eval' is only added in development (React refresh).
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com${isProd ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  "connect-src 'self' https://challenges.cloudflare.com",
+  "frame-src https://challenges.cloudflare.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

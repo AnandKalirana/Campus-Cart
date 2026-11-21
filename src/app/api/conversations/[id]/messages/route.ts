@@ -33,7 +33,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!g.ok) return g.res;
   const { id: productId } = await params;
   if (!idSchema.safeParse(productId).success) return g.ctx.json({ ok: false, code: "not_found", message: "Listing not found." }, 404);
-  const day = messageDailyLimiter.check(g.user.id);
+  const day = await messageDailyLimiter.check(g.user.id);
   if (!day.ok) return g.ctx.json({ ok: false, code: "rate_limited", message: "Daily message limit reached. Try again tomorrow." }, 429, { "retry-after": String(day.retryAfterSec) });
   try {
     const r = await sendMessage(toActor(g.user), productId, g.body.body);

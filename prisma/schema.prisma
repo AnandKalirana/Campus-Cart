@@ -306,3 +306,15 @@ model AuditLog {
   @@index([createdAt(sort: Desc)])
   @@index([targetType, targetId])
 }
+
+// Shared fixed-window rate-limit counters (one row per hashed key). Written ONLY through
+// src/lib/rate-limit/postgres-store.ts, as a single atomic upsert using the database clock.
+// timestamptz on purpose: every comparison uses now(), which must not depend on the session time zone.
+// Keys are HMACs, so no raw IP address or email is stored. Expired rows are swept by cron and opportunistically.
+model RateLimitBucket {
+  key       String   @id @db.VarChar(80)
+  count     Int
+  expiresAt DateTime @db.Timestamptz(3)
+
+  @@index([expiresAt])
+}
