@@ -26,3 +26,7 @@ export const resendVerificationLimiter = createRateLimiter({ limit: 3, windowMs:
 
 export const reportLimiter = createRateLimiter({ limit: 10, windowMs: 24 * 60 * 60_000 });
 export const adminActionLimiter = createRateLimiter({ limit: 120, windowMs: 10 * 60_000 });
+
+// Account data rights (per user). Delete requires the password, so its limit also caps password guessing from a stolen session.
+export const accountExportLimiter = createRateLimiter({ limit: 3, windowMs: 60 * 60_000 });
+export const accountDeleteLimiter = createRateLimiter({ limit: 5, windowMs: 15 * 60_000 });

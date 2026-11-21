@@ -37,7 +37,7 @@ export default function Page() {
       </section>
       <section>
         <h2>Keeping and deleting data</h2>
-        <p>We keep your account data while your account is open. [ACCOUNT DELETION: self-service deletion is not available yet; email [PRIVACY EMAIL] to ask for deletion.] Backups roll off after [BACKUP RETENTION PERIOD].</p>
+        <p>We keep your account data while your account is open. You can download a copy of your data and permanently delete your account from your profile page; deletion also removes your listings, photos, saved items, offers and chats (the other student loses their copy of those chats). A short record that an account was deleted is kept, with no name or email. [PRIVACY EMAIL] for anything the page can&apos;t do. Backups roll off after [BACKUP RETENTION PERIOD].</p>
       </section>
       <section>
         <h2>Your choices</h2>
