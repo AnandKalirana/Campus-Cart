@@ -7,6 +7,13 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # typescript-eslint does not support TypeScript 7 yet (CI lint fails). Revisit when it does.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # @types/node must track the runtime major (Node 22 in CI and on Vercel), not run ahead of it.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
