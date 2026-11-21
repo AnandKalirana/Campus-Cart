@@ -11,6 +11,9 @@ updates:
       # typescript-eslint does not support TypeScript 7 yet (CI lint fails). Revisit when it does.
       - dependency-name: typescript
         update-types: ["version-update:semver-major"]
+      # eslint-config-next and its plugins (react, import, jsx-a11y) only declare support up to ESLint 9; npm has to force ESLint 10 past their peer ranges.
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
       # @types/node must track the runtime major (Node 22 in CI and on Vercel), not run ahead of it.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
