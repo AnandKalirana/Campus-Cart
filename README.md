@@ -16,9 +16,11 @@ npm run dev
 
 ### Database
 ```bash
-npm run db:migrate -- --name init   # creates and applies the first migration
-npm run db:seed                     # categories + placeholder campuses
+npm run db:deploy      # apply committed migrations (use this for Neon and CI)
+npm run db:migrate     # create a new migration during development
+npm run db:seed        # categories + placeholder campuses
 ```
+Migrations should run over the **direct** Neon connection (`DIRECT_URL`), not the pooled `-pooler` host; see `docs/DEPLOYMENT.md`.
 Seeded campuses have **no email domains** on purpose. An admin must set real institutional domains before verification works.
 
 ### Photos (listings)
@@ -37,16 +39,25 @@ Point `TEST_DATABASE_URL` at a disposable database created with `prisma migrate 
 `dev` · `build` · `start` · `lint` · `typecheck` · `db:migrate` · `db:deploy` · `db:seed` · `db:studio`
 
 ## Status
+Not launch-ready. The full, honest checklist (what is verified, what is not) is in [`docs/PRELAUNCH_REPORT.md`](docs/PRELAUNCH_REPORT.md).
+
 | Area | State |
 |---|---|
-| Homepage, header, footer, How it works | Built. Product images are local SVG stand-ins, replace with real photos. |
-| Prisma schema, DB client, env validation, seed | Built. Schema validates and the client generates. Migrations not yet created or run against a database. |
-| Authentication | Built (Phase 3). |
-| Listings: create/edit/pause/sold/remove, photos, search, filters, sort, campus filter, product detail, My listings | Built (Phase 4). Photo storage against Neon not yet verified end to end. |
-| Wishlist, messaging, purchase requests, admin | Not started (placeholder pages). |
-| Tests | Unit + DB integration tests. CI, security headers/CSP, shared rate limiter: not started. |
+| Marketplace: browse, search, filters, campus picker, product pages | Built. The header campus picker is saved in a `cc_campus` cookie and filters browse and the home page on the server. |
+| Auth: sign-up, login, email verification, password reset | Built. Shared Postgres rate limits and Cloudflare Turnstile on login and sign-up (Turnstile not yet tested against real Cloudflare). |
+| Listings: create, edit, pause, mark sold, remove, photos | Built. Photo upload against Neon storage not yet verified end to end. |
+| Wishlist, messaging | Built. |
+| Purchase requests (no payments) | Built. Buyer sees Sent, Seen by seller, Accepted, Deal done (or Declined, Item sold, Listing removed). Seller accepts or declines from the dashboard. |
+| Account export and self-service deletion | Built (profile page). |
+| Admin and moderation | Built (Phase 6). |
+| Email delivery | Drivers for Resend and Brevo built and unit-tested with a fake provider. **No real email sent yet.** |
+| Tests and CI | 126 automated tests (unit + real-Postgres integration) and a CI pipeline (migrations, drift check, typecheck, lint, tests, build, `npm audit`, gitleaks). No committed end-to-end suite. |
+| Performance, monitoring, backups | Not measured / not configured. |
 
-The homepage shows clearly labelled **sample data** (`src/lib/catalog.ts`) only while there are no live listings. Dashboard, wishlist, messages and offers are live (Phase 5).
+The homepage shows clearly labelled **sample data** (`src/lib/catalog.ts`) only while the whole marketplace has no live listings.
+
+## Documentation
+[`docs/SECURITY.md`](docs/SECURITY.md) · [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) · [`docs/RATE_LIMITING.md`](docs/RATE_LIMITING.md) · [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) · [`docs/PRELAUNCH_REPORT.md`](docs/PRELAUNCH_REPORT.md)
 
 ## Admin and moderation (Phase 6)
 
