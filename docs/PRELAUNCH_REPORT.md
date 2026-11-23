@@ -1,6 +1,6 @@
 # Campus Cart: pre-launch engineering report (living draft)
 
-Status as of 2026-11-17. **The application is NOT launch-ready.** This report lists what is verified and what is not. PASS means it was verified by a test or a browser run in this repository. Nothing here is a security certification or a legal-compliance claim.
+Status as of 2026-11-23. **The application is NOT launch-ready.** This report lists what is verified and what is not. PASS means it was verified by a test or a browser run in this repository. Nothing here is a security certification or a legal-compliance claim.
 
 Legend: `[PASS]` verified · `[FAIL]` known gap · `[NOT TESTED]` exists or is assumed but unverified · `[REQUIRES CONFIGURATION]` needs deployment-time setup.
 
@@ -17,7 +17,7 @@ Data collected is described in the draft Privacy Policy (placeholders to fill). 
 No Lighthouse, Core Web Vitals, bundle or database query measurements have been taken. Do not claim any performance result.
 
 ## Testing
-53 automated tests (unit and integration against Postgres 16) plus Playwright browser runs (not committed to the repo) for marketplace, messaging, offers, admin, access control and accessibility. No committed end-to-end suite, no load tests.
+126 automated tests (unit and integration against Postgres 16, last run locally 2026-11-23; CI green on PR #34) plus Playwright browser runs (not committed to the repo) for marketplace, messaging, offers, admin, access control and accessibility. No committed end-to-end suite, no load tests.
 
 ## AI
 No AI features exist. Sections of the standard that concern AI are not applicable today.
@@ -26,7 +26,10 @@ No AI features exist. Sections of the standard that concern AI are not applicabl
 Responsive web only (checked at 375px for horizontal scroll). No native app; Android and iOS device testing not done.
 
 ## Deployment
-Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/workflows/ci.yml`; it ran green on GitHub for PR #18 (2026-11-17).
+Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/workflows/ci.yml`; it ran green on GitHub for PR #34 (2026-11-23). Migrations were applied to the Neon production database on 2026-11-23 (reported by the owner; not independently verified from here).
+
+## Recent changes (2026-11-23)
+Buyer-visible offer status (Sent, Seen by seller, Accepted, Deal done, Item sold), campus-scoped browsing through a `cc_campus` cookie, and visible Accept/Decline errors (PR #34). Verified by 20 new tests and a two-account Chromium run on a local Postgres; axe clean with the offer dialog open. Not verified: behaviour against Neon under real traffic.
 
 ## Remaining risks (most important first)
 1. Login, sign-up, email-sending and destructive actions use a Postgres-backed shared limiter (see `docs/RATE_LIMITING.md`). High-frequency throttles (polling, wishlist, uploads, admin) are still per instance. Not load-tested on Neon.
@@ -103,7 +106,7 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 
 ### Functionality
 - [NOT TESTED] No broken links (no crawl run; Help, Safety and How-it-works pages are partly placeholders)
-- [PASS] Marketplace, listing create/edit/status, photos, wishlist, messaging, offers, reports, admin
+- [PASS] Marketplace, listing create/edit/status, photos, wishlist, messaging, offers (status shown to the buyer, accept/decline, mark sold), campus filter, reports, admin
 - [PASS] Loading, empty and error states on tested flows
 - [PASS] Custom 404 and global error pages
 - [REQUIRES CONFIGURATION] Email flows end to end (drivers tested with a fake provider; no real delivery tested)
@@ -111,7 +114,7 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 
 ### DevOps
 - [NOT TESTED] Environment separation (documented, not set up)
-- [PASS] CI checks (prisma validate, migrate deploy, drift check, typecheck, lint, 53 tests, build, npm audit all green on PR #18)
+- [PASS] CI checks (prisma validate, migrate deploy, drift check, typecheck, lint, tests, build, npm audit and gitleaks green on PR #34)
 - [PASS] Build passes locally; tests pass locally
 - [PASS] Deployment documented
 - [REQUIRES CONFIGURATION] Monitoring and alerting
