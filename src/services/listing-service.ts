@@ -49,7 +49,7 @@ export async function searchListings(p: SearchParams): Promise<{ items: ListingC
   const where: Prisma.ProductWhereInput = {
     ...publicWhere, status: "ACTIVE", // sold items don't appear in browse
     ...(p.category && { category: { slug: p.category } }),
-    ...(p.campus && { university: { slug: p.campus } }),
+    ...(p.campus && p.campus !== "all" && { university: { slug: p.campus } }), // "all" is the explicit every-campus choice
     ...(p.condition && { condition: p.condition }),
     ...((p.min !== undefined || p.max !== undefined) && { price: { ...(p.min !== undefined && { gte: p.min }), ...(p.max !== undefined && { lte: p.max }) } }),
     ...(p.q && { OR: [{ title: { contains: p.q, mode: "insensitive" } }, { description: { contains: p.q, mode: "insensitive" } }] }),
@@ -63,8 +63,11 @@ export async function searchListings(p: SearchParams): Promise<{ items: ListingC
   return { items: rows.map(toCard), total, page: p.page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
 }
 
-export async function latestListings(n = 4): Promise<ListingCardData[]> {
-  const rows = await db().product.findMany({ where: { ...publicWhere, status: "ACTIVE" }, orderBy: { createdAt: "desc" }, take: n, select: cardSelect });
+export async function latestListings(n = 4, campusSlug?: string): Promise<ListingCardData[]> {
+  const rows = await db().product.findMany({
+    where: { ...publicWhere, status: "ACTIVE", ...(campusSlug && { university: { slug: campusSlug } }) },
+    orderBy: { createdAt: "desc" }, take: n, select: cardSelect,
+  });
   return rows.map(toCard);
 }
 
@@ -158,7 +161,18 @@ export async function changeListingStatus(actor: Actor, id: string, action: Tran
     const n = await db().productImage.count({ where: { productId: id, product: { sellerId: actor.id } } });
     if (n < 1) return fail("invalid", "Add at least one photo before publishing.");
   }
-  const r = await db().product.updateMany({ where: { id, sellerId: actor.id, status: { in: t.from } }, data: { status: t.to } });
+  const r = await db().$transaction(async tx => {
+    const res = await tx.product.updateMany({ where: { id, sellerId: actor.id, status: { in: t.from } }, data: { status: t.to } });
+    if (res.count === 1 && action === "sold") {
+      // The buyer whose offer was accepted sees "Deal done" instead of an offer stuck at "Accepted".
+      // Offers that were still pending keep their row but read "Item sold" (derived from the listing), and stop counting as unanswered.
+      await tx.purchaseRequest.updateMany({
+        where: { productId: id, status: "ACCEPTED" },
+        data: { status: "COMPLETED", sellerMarkedSoldAt: new Date() },
+      });
+    }
+    return res;
+  });
   if (r.count !== 1) {
     const exists = await db().product.findFirst({ where: { id, sellerId: actor.id }, select: { status: true } });
     return exists ? fail("conflict", "That change isn't available for this listing's current status.") : fail("not_found", "Listing not found.");

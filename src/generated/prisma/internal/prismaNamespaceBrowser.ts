@@ -223,6 +223,7 @@ export const PurchaseRequestScalarFieldEnum = {
   buyerId: 'buyerId',
   status: 'status',
   note: 'note',
+  sellerSeenAt: 'sellerSeenAt',
   sellerMarkedSoldAt: 'sellerMarkedSoldAt',
   buyerConfirmedAt: 'buyerConfirmedAt',
   createdAt: 'createdAt',

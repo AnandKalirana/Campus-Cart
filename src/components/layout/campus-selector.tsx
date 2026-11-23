@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Check, ChevronDown, MapPin } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CAMPUSES } from "@/lib/catalog";
-import { campusShort, setCampus, useCampus } from "@/lib/campus-store";
+import { CAMPUSES, CAMPUS_SLUG } from "@/lib/catalog";
+import { campusShort, legacyCampusToMigrate, setCampus, useCampus } from "@/lib/campus-store";
 
 /** `compact` shows the short code ("UW") to save header width; the full name stays in the accessible name. */
 export function CampusSelector({ compact = false }: { compact?: boolean }) {
@@ -11,6 +12,13 @@ export function CampusSelector({ compact = false }: { compact?: boolean }) {
   const campus = useCampus();
   const ref = useRef<HTMLDivElement>(null);
   const listId = useId();
+  const router = useRouter();
+
+  // One-time: a campus saved by an older version only lived in this browser. Hand it to the server too.
+  useEffect(() => {
+    const legacy = legacyCampusToMigrate();
+    if (legacy) { setCampus(legacy); router.refresh(); }
+  }, [router]);
 
   useEffect(() => {
     if (!open) return;
@@ -23,7 +31,16 @@ export function CampusSelector({ compact = false }: { compact?: boolean }) {
 
   const choose = (c: string) => {
     setOpen(false);
-    setCampus(c);
+    setCampus(c); // writes the cookie the server reads
+    // An explicit ?campus= in the marketplace URL would override the cookie, so move it to the new campus too.
+    const url = new URL(window.location.href);
+    if (url.pathname === "/marketplace") {
+      url.searchParams.set("campus", CAMPUS_SLUG[c as keyof typeof CAMPUS_SLUG]);
+      url.searchParams.delete("page");
+      router.push(`${url.pathname}${url.search}`);
+    } else {
+      router.refresh(); // re-run server components (home "Hot drops") with the new cookie
+    }
   };
 
   return (

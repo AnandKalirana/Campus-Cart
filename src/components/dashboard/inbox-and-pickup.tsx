@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Mail } from "lucide-react";
 import { Resp } from "@/components/ui/resp";
+import { describeOffer } from "@/lib/offer-status";
 import type { PurchaseRequestWithDetails } from "@/services/purchase-request-service";
 
 interface InboxAndPickupProps {
@@ -11,7 +12,7 @@ interface InboxAndPickupProps {
 }
 
 export function InboxAndPickup({ conversations, purchaseRequests, accepted }: InboxAndPickupProps) {
-  const pendingRequests = purchaseRequests.filter(r => r.status === "PENDING");
+  const pendingRequests = purchaseRequests.filter(r => r.status === "PENDING" && !describeOffer(r, "seller").closed);
   const next = accepted[0];
 
   return (
@@ -27,7 +28,7 @@ export function InboxAndPickup({ conversations, purchaseRequests, accepted }: In
           <div className="mb-4 space-y-3">
             <p className="font-raw text-sm text-cc-muted">Purchase requests</p>
             {pendingRequests.slice(0, 3).map(r => (
-              <Link key={r.id} href={`/products/${r.productId}`} className="bru-card-lift flex items-center gap-3 p-3 border-2 border-black hover:bg-[#fef9c3] transition-colors">
+              <Link key={r.id} href="/dashboard#purchase-requests" className="bru-card-lift flex items-center gap-3 p-3 border-2 border-black hover:bg-[#fef9c3] transition-colors">
                 <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden border-2 border-black bg-cc-sky">
                   {r.productImage ? (
                     <Image src={r.productImage} alt="" fill sizes="40px" className="object-cover" />
@@ -43,7 +44,7 @@ export function InboxAndPickup({ conversations, purchaseRequests, accepted }: In
               </Link>
             ))}
             {pendingRequests.length > 3 && (
-              <Link href="/dashboard" className="text-xs font-bold underline hover:bg-black hover:text-white">+{pendingRequests.length - 3} more offers</Link>
+              <Link href="/dashboard#purchase-requests" className="text-xs font-bold underline hover:bg-black hover:text-white">+{pendingRequests.length - 3} more offers</Link>
             )}
           </div>
         )}

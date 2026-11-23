@@ -15,7 +15,7 @@ function SelectField({ label, name, value, children }: { label: string; name: st
 
 // A plain GET form: filters live in the URL, so results are shareable, bookmarkable and work without JS.
 export function FilterForm({ p, categories, campuses }: { p: SearchParams; categories: Opt[]; campuses: Opt[] }) {
-  const active = [p.q, p.category, p.campus, p.condition, p.min, p.max].some(v => v !== undefined) || p.sort !== "newest";
+  const active = [p.q, p.category, p.condition, p.min, p.max].some(v => v !== undefined) || p.sort !== "newest";
   return (
     <form method="get" action="/marketplace" role="search" aria-label="Search and filter listings" className="bru-card space-y-5 p-5 sm:p-6">
       <div>
@@ -27,7 +27,7 @@ export function FilterForm({ p, categories, campuses }: { p: SearchParams; categ
       </div>
       <div className="grid grid-cols-1 gap-4 min-[560px]:grid-cols-2 lg:grid-cols-6">
         <SelectField label="Category" name="category" value={p.category}><option value="">All categories</option>{categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}</SelectField>
-        <SelectField label="Campus" name="campus" value={p.campus}><option value="">All campuses</option>{campuses.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}</SelectField>
+        <SelectField label="Campus" name="campus" value={p.campus}><option value="all">All campuses</option>{campuses.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}</SelectField>
         <SelectField label="Condition" name="condition" value={p.condition}><option value="">Any condition</option>{CONDITION_VALUES.map(c => <option key={c} value={c}>{CONDITION_LABEL[c]}</option>)}</SelectField>
         <div>
           <label htmlFor="f-min" className="font-raw mb-1 block text-xs">Min ₹</label>

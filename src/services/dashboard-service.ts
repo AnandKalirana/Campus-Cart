@@ -86,7 +86,7 @@ async function getDashboardStats(userId: string): Promise<DashboardStats> {
     db().wishlist.count({ where: { userId } }),
     db().purchaseRequest.count({
       where: {
-        product: { sellerId: userId },
+        product: { sellerId: userId, status: { in: ["ACTIVE", "PAUSED"] } }, // offers on sold/removed listings need no reply
         status: "PENDING",
       },
     }),

@@ -69,7 +69,7 @@ Vercel + Neon planned; see `docs/DEPLOYMENT.md`. CI workflow is in `.github/work
 ### Privacy
 - [FAIL] Privacy Policy (draft with placeholders, not reviewed)
 - [FAIL] Terms & Conditions (draft with placeholders, not reviewed)
-- [PASS] Cookie notice (essential cookies only; consent not required while no optional cookies exist)
+- [REQUIRES REVIEW] Cookie notice: essential cookies plus one preference cookie (`cc_campus`, the chosen campus slug; no tracking). The notice discloses it; whether it needs consent in the target market is a legal question and has not been reviewed
 - [PASS] Data minimization (no location, no analytics, no payments)
 - [FAIL] Data retention defined (log, backup and inactive-account periods are placeholders)
 - [PASS] Third-party AI data handling: no AI providers used

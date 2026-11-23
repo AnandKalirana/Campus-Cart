@@ -244,6 +244,7 @@ model PurchaseRequest {
   buyerId            String
   status             RequestStatus @default(PENDING)
   note               String?       @db.VarChar(500)
+  sellerSeenAt       DateTime? // first time the seller opened this offer; lets the buyer see "Seen by seller"
   sellerMarkedSoldAt DateTime?
   buyerConfirmedAt   DateTime?
   createdAt          DateTime      @default(now())

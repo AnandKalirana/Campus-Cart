@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import type { Actor } from "@/services/listing-service";
@@ -17,6 +18,7 @@ export interface PurchaseRequestWithDetails {
   sellerName: string;
   status: "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED" | "COMPLETED";
   note: string | null;
+  sellerSeenAt: Date | null;
   sellerMarkedSoldAt: Date | null;
   buyerConfirmedAt: Date | null;
   createdAt: Date;
@@ -26,6 +28,43 @@ export interface PurchaseRequestWithDetails {
 export type PurchaseRequestResult =
   | { ok: true; request: PurchaseRequestWithDetails }
   | { ok: false; code: "forbidden" | "not_found" | "invalid" | "conflict" | "limit"; message: string };
+
+export type OfferNewStatus = "ACCEPTED" | "DECLINED" | "CANCELLED" | "COMPLETED";
+
+// One include and one mapper for every read, so a new field can't be added to one query and forgotten in another.
+const detailInclude = {
+  product: {
+    select: {
+      id: true, title: true, price: true, status: true, sellerId: true,
+      images: { orderBy: { position: "asc" }, take: 1, select: { url: true } },
+      seller: { select: { id: true, name: true } },
+    },
+  },
+  buyer: { select: { id: true, name: true } },
+} satisfies Prisma.PurchaseRequestInclude;
+
+type Row = Prisma.PurchaseRequestGetPayload<{ include: typeof detailInclude }>;
+
+function toDetails(r: Row): PurchaseRequestWithDetails {
+  return {
+    id: r.id,
+    productId: r.product.id,
+    productTitle: r.product.title,
+    productPrice: r.product.price,
+    productImage: r.product.images[0]?.url ?? null,
+    productStatus: r.product.status,
+    buyerId: r.buyer.id,
+    buyerName: r.buyer.name.split(" ")[0],
+    sellerName: r.product.seller.name.split(" ")[0],
+    status: r.status,
+    note: r.note,
+    sellerSeenAt: r.sellerSeenAt,
+    sellerMarkedSoldAt: r.sellerMarkedSoldAt,
+    buyerConfirmedAt: r.buyerConfirmedAt,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+  };
+}
 
 /** Create a purchase request (buyer only) */
 export async function createPurchaseRequest(
@@ -72,278 +111,129 @@ export async function createPurchaseRequest(
       status: "PENDING",
       note: note?.trim().slice(0, 500) ?? null,
     },
-    include: {
-      product: {
-        select: {
-          id: true,
-          title: true,
-          price: true,
-          status: true,
-          images: { orderBy: { position: "asc" }, take: 1, select: { url: true } },
-          seller: { select: { id: true, name: true } },
-        },
-      },
-      buyer: { select: { id: true, name: true } },
-    },
+    include: detailInclude,
   });
 
-  return {
-    ok: true,
-    request: {
-      id: request.id,
-      productId: request.product.id,
-      productTitle: request.product.title,
-      productPrice: request.product.price,
-      productImage: request.product.images[0]?.url ?? null,
-      productStatus: request.product.status,
-      buyerId: request.buyer.id,
-      buyerName: request.buyer.name.split(" ")[0],
-    sellerName: request.product.seller.name.split(" ")[0],
-      status: request.status,
-      note: request.note,
-      sellerMarkedSoldAt: request.sellerMarkedSoldAt,
-      buyerConfirmedAt: request.buyerConfirmedAt,
-      createdAt: request.createdAt,
-      updatedAt: request.updatedAt,
-    },
-  };
+  return { ok: true, request: toDetails(request) };
+}
+
+/** Offers the given user sent (buyer) or received (seller). The id always comes from the session, never the request. */
+export async function getPurchaseRequestsFor(userId: string, role: "buyer" | "seller"): Promise<PurchaseRequestWithDetails[]> {
+  const where: Prisma.PurchaseRequestWhereInput = role === "buyer" ? { buyerId: userId } : { product: { sellerId: userId } };
+  const requests = await db().purchaseRequest.findMany({ where, orderBy: { createdAt: "desc" }, take: 200, include: detailInclude });
+  return requests.map(toDetails);
 }
 
 /** Get purchase requests for the current user (as buyer or seller) */
 export async function getPurchaseRequests(role: "buyer" | "seller"): Promise<PurchaseRequestWithDetails[]> {
   const user = await requireUser("/dashboard");
-
-  const where = role === "buyer"
-    ? { buyerId: user.id }
-    : { product: { sellerId: user.id } };
-
-  const requests = await db().purchaseRequest.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    include: {
-      product: {
-        select: {
-          id: true,
-          title: true,
-          price: true,
-          status: true,
-          images: { orderBy: { position: "asc" }, take: 1, select: { url: true } },
-          seller: { select: { id: true, name: true } },
-        },
-      },
-      buyer: { select: { id: true, name: true } },
-    },
-  });
-
-  return requests.map(r => ({
-    id: r.id,
-    productId: r.product.id,
-    productTitle: r.product.title,
-    productPrice: r.product.price,
-    productImage: r.product.images[0]?.url ?? null,
-    productStatus: r.product.status,
-    buyerId: r.buyer.id,
-    buyerName: r.buyer.name.split(" ")[0],
-    sellerName: r.product.seller.name.split(" ")[0],
-    status: r.status,
-    note: r.note,
-    sellerMarkedSoldAt: r.sellerMarkedSoldAt,
-    buyerConfirmedAt: r.buyerConfirmedAt,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
-  }));
+  return getPurchaseRequestsFor(user.id, role);
 }
 
 /** Get a single purchase request with access control */
 export async function getPurchaseRequest(requestId: string): Promise<PurchaseRequestWithDetails | null> {
   const user = await requireUser("/dashboard");
-
-  const request = await db().purchaseRequest.findUnique({
-    where: { id: requestId },
-    include: {
-      product: {
-        select: {
-          id: true,
-          title: true,
-          price: true,
-          status: true,
-          images: { orderBy: { position: "asc" }, take: 1, select: { url: true } },
-          sellerId: true,
-          seller: { select: { id: true, name: true } },
-        },
-      },
-      buyer: { select: { id: true, name: true } },
-    },
-  });
-
+  const request = await db().purchaseRequest.findUnique({ where: { id: requestId }, include: detailInclude });
   if (!request) return null;
-
-  // Only buyer or seller can view
-  if (request.buyerId !== user.id && request.product.sellerId !== user.id) {
-    return null;
-  }
-
-  return {
-    id: request.id,
-    productId: request.product.id,
-    productTitle: request.product.title,
-    productPrice: request.product.price,
-    productImage: request.product.images[0]?.url ?? null,
-    productStatus: request.product.status,
-    buyerId: request.buyer.id,
-    buyerName: request.buyer.name.split(" ")[0],
-    sellerName: request.product.seller.name.split(" ")[0],
-    status: request.status,
-    note: request.note,
-    sellerMarkedSoldAt: request.sellerMarkedSoldAt,
-    buyerConfirmedAt: request.buyerConfirmedAt,
-    createdAt: request.createdAt,
-    updatedAt: request.updatedAt,
-  };
+  // Only buyer or seller can view; anyone else gets the same "not found" as a missing id.
+  if (request.buyerId !== user.id && request.product.sellerId !== user.id) return null;
+  return toDetails(request);
 }
 
-/** Update purchase request status (seller: accept/decline; buyer: cancel; both: complete) */
-export async function updatePurchaseRequestStatus(
-  requestId: string,
-  newStatus: "ACCEPTED" | "DECLINED" | "CANCELLED" | "COMPLETED"
-): Promise<PurchaseRequestResult> {
-  const user = await requireUser("/dashboard");
+/**
+ * The seller opened this offer. Idempotent: the first open stamps the time, later opens change nothing.
+ * Only the listing's seller can do this; everyone else gets not_found, same as a missing id.
+ */
+export async function markOfferSeenAs(userId: string, requestId: string): Promise<{ ok: true; seenAt: Date } | { ok: false; code: "not_found" }> {
+  const r = await db().purchaseRequest.findUnique({ where: { id: requestId }, select: { sellerSeenAt: true, product: { select: { sellerId: true } } } });
+  if (!r || r.product.sellerId !== userId) return { ok: false, code: "not_found" };
+  if (r.sellerSeenAt) return { ok: true, seenAt: r.sellerSeenAt };
+  const now = new Date();
+  await db().purchaseRequest.updateMany({ where: { id: requestId, sellerSeenAt: null }, data: { sellerSeenAt: now } }); // a concurrent open may have won; fine
+  const fresh = await db().purchaseRequest.findUnique({ where: { id: requestId }, select: { sellerSeenAt: true } });
+  return { ok: true, seenAt: fresh?.sellerSeenAt ?? now };
+}
 
+export async function markOfferSeen(requestId: string) {
+  const user = await requireUser("/dashboard");
+  return markOfferSeenAs(user.id, requestId);
+}
+
+class Conflict extends Error {}
+
+/** Update purchase request status (seller: accept/decline; buyer: cancel; both: complete) */
+export async function updatePurchaseRequestStatus(requestId: string, newStatus: OfferNewStatus): Promise<PurchaseRequestResult> {
+  const user = await requireUser("/dashboard");
+  return updatePurchaseRequestStatusAs(user.id, requestId, newStatus);
+}
+
+export async function updatePurchaseRequestStatusAs(userId: string, requestId: string, newStatus: OfferNewStatus): Promise<PurchaseRequestResult> {
   const request = await db().purchaseRequest.findUnique({
     where: { id: requestId },
-    include: {
-      product: { select: { id: true, sellerId: true, status: true, title: true } },
-      buyer: { select: { id: true, name: true } },
-    },
+    include: { product: { select: { id: true, sellerId: true, status: true, title: true } } },
   });
 
-  if (!request) {
-    return { ok: false, code: "not_found", message: "Request not found" };
-  }
-
-  const isSeller = request.product.sellerId === user.id;
-  const isBuyer = request.buyerId === user.id;
+  // A stranger gets the same answer as a missing id, so offer ids can't be probed.
+  if (!request) return { ok: false, code: "not_found", message: "Request not found" };
+  const isSeller = request.product.sellerId === userId;
+  const isBuyer = request.buyerId === userId;
+  if (!isSeller && !isBuyer) return { ok: false, code: "not_found", message: "Request not found" };
 
   // Validate transition permissions
   let allowed = false;
-  if (isSeller && ["ACCEPTED", "DECLINED"].includes(newStatus) && request.status === "PENDING") {
-    allowed = true;
-  }
-  if (isBuyer && newStatus === "CANCELLED" && request.status === "PENDING") {
-    allowed = true;
-  }
-  if ((isSeller || isBuyer) && newStatus === "COMPLETED" && request.status === "ACCEPTED") {
-    allowed = true;
-  }
+  if (isSeller && (newStatus === "ACCEPTED" || newStatus === "DECLINED") && request.status === "PENDING") allowed = true;
+  if (isBuyer && newStatus === "CANCELLED" && request.status === "PENDING") allowed = true;
+  if (newStatus === "COMPLETED" && request.status === "ACCEPTED") allowed = true;
   if (!allowed) {
-    return { ok: false, code: "forbidden", message: "Invalid status transition" };
+    return { ok: false, code: "forbidden", message: request.status === "PENDING" || request.status === "ACCEPTED" ? "You can't do that with this offer." : "This offer has already been closed." };
   }
 
-  // Additional validation for ACCEPTED
-  if (newStatus === "ACCEPTED") {
-    if (request.product.status !== "ACTIVE") {
-      return { ok: false, code: "conflict", message: "Listing is no longer active" };
-    }
-    // Check no other accepted request exists
-    const otherAccepted = await db().purchaseRequest.findFirst({
-      where: { productId: request.productId, status: "ACCEPTED", id: { not: requestId } },
-      select: { id: true },
-    });
-    if (otherAccepted) {
-      return { ok: false, code: "conflict", message: "Another offer already accepted" };
-    }
+  if (newStatus === "ACCEPTED" && (request.product.status === "SOLD" || request.product.status === "REMOVED")) {
+    return { ok: false, code: "conflict", message: request.product.status === "SOLD" ? "This item is already sold." : "This listing was removed." };
   }
 
-  // Perform update with side effects
-  const updated = await db().$transaction(async tx => {
-    const updateData: Record<string, unknown> = { status: newStatus };
-
-    if (newStatus === "ACCEPTED") {
-      // Pause the listing so no new requests come in
-      await tx.product.update({
-        where: { id: request.productId },
-        data: { status: "PAUSED" },
-      });
-    }
-    if (newStatus === "COMPLETED") {
-      // Each side confirms for themselves. The deal only completes (and the item is only marked SOLD)
-      // once BOTH have confirmed, so neither party can close it alone.
-      const fresh = await tx.purchaseRequest.findUnique({ where: { id: requestId }, select: { sellerMarkedSoldAt: true, buyerConfirmedAt: true } });
-      const now = new Date();
-      const sellerAt = fresh?.sellerMarkedSoldAt ?? (isSeller ? now : null);
-      const buyerAt = fresh?.buyerConfirmedAt ?? (isBuyer ? now : null);
-      if (isSeller) updateData.sellerMarkedSoldAt = sellerAt;
-      if (isBuyer) updateData.buyerConfirmedAt = buyerAt;
-      if (sellerAt && buyerAt) {
-        await tx.product.update({ where: { id: request.productId }, data: { status: "SOLD" } });
-      } else {
-        updateData.status = "ACCEPTED"; // still waiting for the other side
+  try {
+    const updated = await db().$transaction(async tx => {
+      if (newStatus === "ACCEPTED") {
+        const otherAccepted = await tx.purchaseRequest.findFirst({ where: { productId: request.productId, status: "ACCEPTED", id: { not: requestId } }, select: { id: true } });
+        if (otherAccepted) throw new Conflict("You already accepted another offer for this item.");
+        await tx.product.update({ where: { id: request.productId }, data: { status: "PAUSED" } }); // no new offers while one is accepted
       }
-    }
-    if (newStatus === "DECLINED" || newStatus === "CANCELLED") {
-      // If this was the only accepted request, reactivate the listing
-      if (request.status === "ACCEPTED") {
-        const otherAccepted = await tx.purchaseRequest.findFirst({
-          where: { productId: request.productId, status: "ACCEPTED", id: { not: requestId } },
-          select: { id: true },
-        });
-        if (!otherAccepted) {
-          await tx.product.update({
-            where: { id: request.productId },
-            data: { status: "ACTIVE" },
-          });
-        }
-      }
-    }
 
-    return tx.purchaseRequest.update({
-      where: { id: requestId },
-      data: updateData,
-      include: {
-        product: {
-          select: {
-            id: true,
-            title: true,
-            price: true,
-            status: true,
-            images: { orderBy: { position: "asc" }, take: 1, select: { url: true } },
-            seller: { select: { id: true, name: true } },
-          },
-        },
-        buyer: { select: { id: true, name: true } },
-      },
+      const data: Prisma.PurchaseRequestUpdateManyMutationInput = { status: newStatus };
+      if (newStatus === "COMPLETED") {
+        // Each side confirms for themselves. The deal only completes (and the item is only marked SOLD)
+        // once BOTH have confirmed, so neither party can close it alone.
+        const fresh = await tx.purchaseRequest.findUnique({ where: { id: requestId }, select: { sellerMarkedSoldAt: true, buyerConfirmedAt: true } });
+        const now = new Date();
+        const sellerAt = fresh?.sellerMarkedSoldAt ?? (isSeller ? now : null);
+        const buyerAt = fresh?.buyerConfirmedAt ?? (isBuyer ? now : null);
+        if (isSeller) data.sellerMarkedSoldAt = sellerAt;
+        if (isBuyer) data.buyerConfirmedAt = buyerAt;
+        if (sellerAt && buyerAt) await tx.product.update({ where: { id: request.productId }, data: { status: "SOLD" } });
+        else data.status = "ACCEPTED"; // still waiting for the other side
+      }
+      if ((newStatus === "DECLINED" || newStatus === "CANCELLED") && request.status === "ACCEPTED") {
+        const otherAccepted = await tx.purchaseRequest.findFirst({ where: { productId: request.productId, status: "ACCEPTED", id: { not: requestId } }, select: { id: true } });
+        if (!otherAccepted) await tx.product.update({ where: { id: request.productId }, data: { status: "ACTIVE" } });
+      }
+
+      // Compare-and-set on the status we validated against: a double click or a second device can't apply the same transition twice.
+      const done = await tx.purchaseRequest.updateMany({ where: { id: requestId, status: request.status }, data });
+      if (done.count !== 1) throw new Conflict("This offer was just changed. Refresh and try again.");
+      return tx.purchaseRequest.findUniqueOrThrow({ where: { id: requestId }, include: detailInclude });
     });
-  });
-
-  return {
-    ok: true,
-    request: {
-      id: updated.id,
-      productId: updated.product.id,
-      productTitle: updated.product.title,
-      productPrice: updated.product.price,
-      productImage: updated.product.images[0]?.url ?? null,
-      productStatus: updated.product.status,
-      buyerId: updated.buyer.id,
-      buyerName: updated.buyer.name.split(" ")[0],
-      sellerName: updated.product.seller.name.split(" ")[0],
-      status: updated.status,
-      note: updated.note,
-      sellerMarkedSoldAt: updated.sellerMarkedSoldAt,
-      buyerConfirmedAt: updated.buyerConfirmedAt,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-    },
-  };
+    return { ok: true, request: toDetails(updated) };
+  } catch (e) {
+    if (e instanceof Conflict) return { ok: false, code: "conflict", message: e.message };
+    throw e;
+  }
 }
 
-/** Get pending purchase request count for seller badge */
+/** Pending offers the seller still has to answer (offers on sold or removed listings no longer count). */
 export async function getPendingRequestCount(): Promise<number> {
   const user = await requireUser("/dashboard");
   return db().purchaseRequest.count({
-    where: {
-      product: { sellerId: user.id },
-      status: "PENDING",
-    },
+    where: { product: { sellerId: user.id, status: { in: ["ACTIVE", "PAUSED"] } }, status: "PENDING" },
   });
 }
