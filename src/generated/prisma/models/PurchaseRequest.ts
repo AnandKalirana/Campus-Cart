@@ -30,6 +30,7 @@ export type PurchaseRequestMinAggregateOutputType = {
   buyerId: string | null
   status: $Enums.RequestStatus | null
   note: string | null
+  sellerSeenAt: Date | null
   sellerMarkedSoldAt: Date | null
   buyerConfirmedAt: Date | null
   createdAt: Date | null
@@ -42,6 +43,7 @@ export type PurchaseRequestMaxAggregateOutputType = {
   buyerId: string | null
   status: $Enums.RequestStatus | null
   note: string | null
+  sellerSeenAt: Date | null
   sellerMarkedSoldAt: Date | null
   buyerConfirmedAt: Date | null
   createdAt: Date | null
@@ -54,6 +56,7 @@ export type PurchaseRequestCountAggregateOutputType = {
   buyerId: number
   status: number
   note: number
+  sellerSeenAt: number
   sellerMarkedSoldAt: number
   buyerConfirmedAt: number
   createdAt: number
@@ -68,6 +71,7 @@ export type PurchaseRequestMinAggregateInputType = {
   buyerId?: true
   status?: true
   note?: true
+  sellerSeenAt?: true
   sellerMarkedSoldAt?: true
   buyerConfirmedAt?: true
   createdAt?: true
@@ -80,6 +84,7 @@ export type PurchaseRequestMaxAggregateInputType = {
   buyerId?: true
   status?: true
   note?: true
+  sellerSeenAt?: true
   sellerMarkedSoldAt?: true
   buyerConfirmedAt?: true
   createdAt?: true
@@ -92,6 +97,7 @@ export type PurchaseRequestCountAggregateInputType = {
   buyerId?: true
   status?: true
   note?: true
+  sellerSeenAt?: true
   sellerMarkedSoldAt?: true
   buyerConfirmedAt?: true
   createdAt?: true
@@ -177,6 +183,7 @@ export type PurchaseRequestGroupByOutputType = {
   buyerId: string
   status: $Enums.RequestStatus
   note: string | null
+  sellerSeenAt: Date | null
   sellerMarkedSoldAt: Date | null
   buyerConfirmedAt: Date | null
   createdAt: Date
@@ -210,6 +217,7 @@ export type PurchaseRequestWhereInput = {
   buyerId?: Prisma.StringFilter<"PurchaseRequest"> | string
   status?: Prisma.EnumRequestStatusFilter<"PurchaseRequest"> | $Enums.RequestStatus
   note?: Prisma.StringNullableFilter<"PurchaseRequest"> | string | null
+  sellerSeenAt?: Prisma.DateTimeNullableFilter<"PurchaseRequest"> | Date | string | null
   sellerMarkedSoldAt?: Prisma.DateTimeNullableFilter<"PurchaseRequest"> | Date | string | null
   buyerConfirmedAt?: Prisma.DateTimeNullableFilter<"PurchaseRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PurchaseRequest"> | Date | string
@@ -224,6 +232,7 @@ export type PurchaseRequestOrderByWithRelationInput = {
   buyerId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellerSeenAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sellerMarkedSoldAt?: Prisma.SortOrderInput | Prisma.SortOrder
   buyerConfirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -242,6 +251,7 @@ export type PurchaseRequestWhereUniqueInput = Prisma.AtLeast<{
   buyerId?: Prisma.StringFilter<"PurchaseRequest"> | string
   status?: Prisma.EnumRequestStatusFilter<"PurchaseRequest"> | $Enums.RequestStatus
   note?: Prisma.StringNullableFilter<"PurchaseRequest"> | string | null
+  sellerSeenAt?: Prisma.DateTimeNullableFilter<"PurchaseRequest"> | Date | string | null
   sellerMarkedSoldAt?: Prisma.DateTimeNullableFilter<"PurchaseRequest"> | Date | string | null
   buyerConfirmedAt?: Prisma.DateTimeNullableFilter<"PurchaseRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PurchaseRequest"> | Date | string
@@ -256,6 +266,7 @@ export type PurchaseRequestOrderByWithAggregationInput = {
   buyerId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellerSeenAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sellerMarkedSoldAt?: Prisma.SortOrderInput | Prisma.SortOrder
   buyerConfirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -274,6 +285,7 @@ export type PurchaseRequestScalarWhereWithAggregatesInput = {
   buyerId?: Prisma.StringWithAggregatesFilter<"PurchaseRequest"> | string
   status?: Prisma.EnumRequestStatusWithAggregatesFilter<"PurchaseRequest"> | $Enums.RequestStatus
   note?: Prisma.StringNullableWithAggregatesFilter<"PurchaseRequest"> | string | null
+  sellerSeenAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PurchaseRequest"> | Date | string | null
   sellerMarkedSoldAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PurchaseRequest"> | Date | string | null
   buyerConfirmedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PurchaseRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PurchaseRequest"> | Date | string
@@ -284,6 +296,7 @@ export type PurchaseRequestCreateInput = {
   id?: string
   status?: $Enums.RequestStatus
   note?: string | null
+  sellerSeenAt?: Date | string | null
   sellerMarkedSoldAt?: Date | string | null
   buyerConfirmedAt?: Date | string | null
   createdAt?: Date | string
@@ -298,6 +311,7 @@ export type PurchaseRequestUncheckedCreateInput = {
   buyerId: string
   status?: $Enums.RequestStatus
   note?: string | null
+  sellerSeenAt?: Date | string | null
   sellerMarkedSoldAt?: Date | string | null
   buyerConfirmedAt?: Date | string | null
   createdAt?: Date | string
@@ -308,6 +322,7 @@ export type PurchaseRequestUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -322,6 +337,7 @@ export type PurchaseRequestUncheckedUpdateInput = {
   buyerId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -334,6 +350,7 @@ export type PurchaseRequestCreateManyInput = {
   buyerId: string
   status?: $Enums.RequestStatus
   note?: string | null
+  sellerSeenAt?: Date | string | null
   sellerMarkedSoldAt?: Date | string | null
   buyerConfirmedAt?: Date | string | null
   createdAt?: Date | string
@@ -344,6 +361,7 @@ export type PurchaseRequestUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -356,6 +374,7 @@ export type PurchaseRequestUncheckedUpdateManyInput = {
   buyerId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -383,6 +402,7 @@ export type PurchaseRequestCountOrderByAggregateInput = {
   buyerId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  sellerSeenAt?: Prisma.SortOrder
   sellerMarkedSoldAt?: Prisma.SortOrder
   buyerConfirmedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -395,6 +415,7 @@ export type PurchaseRequestMaxOrderByAggregateInput = {
   buyerId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  sellerSeenAt?: Prisma.SortOrder
   sellerMarkedSoldAt?: Prisma.SortOrder
   buyerConfirmedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -407,6 +428,7 @@ export type PurchaseRequestMinOrderByAggregateInput = {
   buyerId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  sellerSeenAt?: Prisma.SortOrder
   sellerMarkedSoldAt?: Prisma.SortOrder
   buyerConfirmedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -505,6 +527,7 @@ export type PurchaseRequestCreateWithoutBuyerInput = {
   id?: string
   status?: $Enums.RequestStatus
   note?: string | null
+  sellerSeenAt?: Date | string | null
   sellerMarkedSoldAt?: Date | string | null
   buyerConfirmedAt?: Date | string | null
   createdAt?: Date | string
@@ -517,6 +540,7 @@ export type PurchaseRequestUncheckedCreateWithoutBuyerInput = {
   productId: string
   status?: $Enums.RequestStatus
   note?: string | null
+  sellerSeenAt?: Date | string | null
   sellerMarkedSoldAt?: Date | string | null
   buyerConfirmedAt?: Date | string | null
   createdAt?: Date | string
@@ -558,6 +582,7 @@ export type PurchaseRequestScalarWhereInput = {
   buyerId?: Prisma.StringFilter<"PurchaseRequest"> | string
   status?: Prisma.EnumRequestStatusFilter<"PurchaseRequest"> | $Enums.RequestStatus
   note?: Prisma.StringNullableFilter<"PurchaseRequest"> | string | null
+  sellerSeenAt?: Prisma.DateTimeNullableFilter<"PurchaseRequest"> | Date | string | null
   sellerMarkedSoldAt?: Prisma.DateTimeNullableFilter<"PurchaseRequest"> | Date | string | null
   buyerConfirmedAt?: Prisma.DateTimeNullableFilter<"PurchaseRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PurchaseRequest"> | Date | string
@@ -568,6 +593,7 @@ export type PurchaseRequestCreateWithoutProductInput = {
   id?: string
   status?: $Enums.RequestStatus
   note?: string | null
+  sellerSeenAt?: Date | string | null
   sellerMarkedSoldAt?: Date | string | null
   buyerConfirmedAt?: Date | string | null
   createdAt?: Date | string
@@ -580,6 +606,7 @@ export type PurchaseRequestUncheckedCreateWithoutProductInput = {
   buyerId: string
   status?: $Enums.RequestStatus
   note?: string | null
+  sellerSeenAt?: Date | string | null
   sellerMarkedSoldAt?: Date | string | null
   buyerConfirmedAt?: Date | string | null
   createdAt?: Date | string
@@ -617,6 +644,7 @@ export type PurchaseRequestCreateManyBuyerInput = {
   productId: string
   status?: $Enums.RequestStatus
   note?: string | null
+  sellerSeenAt?: Date | string | null
   sellerMarkedSoldAt?: Date | string | null
   buyerConfirmedAt?: Date | string | null
   createdAt?: Date | string
@@ -627,6 +655,7 @@ export type PurchaseRequestUpdateWithoutBuyerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -639,6 +668,7 @@ export type PurchaseRequestUncheckedUpdateWithoutBuyerInput = {
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -650,6 +680,7 @@ export type PurchaseRequestUncheckedUpdateManyWithoutBuyerInput = {
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -661,6 +692,7 @@ export type PurchaseRequestCreateManyProductInput = {
   buyerId: string
   status?: $Enums.RequestStatus
   note?: string | null
+  sellerSeenAt?: Date | string | null
   sellerMarkedSoldAt?: Date | string | null
   buyerConfirmedAt?: Date | string | null
   createdAt?: Date | string
@@ -671,6 +703,7 @@ export type PurchaseRequestUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -683,6 +716,7 @@ export type PurchaseRequestUncheckedUpdateWithoutProductInput = {
   buyerId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -694,6 +728,7 @@ export type PurchaseRequestUncheckedUpdateManyWithoutProductInput = {
   buyerId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSeenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerMarkedSoldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buyerConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -708,6 +743,7 @@ export type PurchaseRequestSelect<ExtArgs extends runtime.Types.Extensions.Inter
   buyerId?: boolean
   status?: boolean
   note?: boolean
+  sellerSeenAt?: boolean
   sellerMarkedSoldAt?: boolean
   buyerConfirmedAt?: boolean
   createdAt?: boolean
@@ -722,6 +758,7 @@ export type PurchaseRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   buyerId?: boolean
   status?: boolean
   note?: boolean
+  sellerSeenAt?: boolean
   sellerMarkedSoldAt?: boolean
   buyerConfirmedAt?: boolean
   createdAt?: boolean
@@ -736,6 +773,7 @@ export type PurchaseRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   buyerId?: boolean
   status?: boolean
   note?: boolean
+  sellerSeenAt?: boolean
   sellerMarkedSoldAt?: boolean
   buyerConfirmedAt?: boolean
   createdAt?: boolean
@@ -750,13 +788,14 @@ export type PurchaseRequestSelectScalar = {
   buyerId?: boolean
   status?: boolean
   note?: boolean
+  sellerSeenAt?: boolean
   sellerMarkedSoldAt?: boolean
   buyerConfirmedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PurchaseRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "buyerId" | "status" | "note" | "sellerMarkedSoldAt" | "buyerConfirmedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["purchaseRequest"]>
+export type PurchaseRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "buyerId" | "status" | "note" | "sellerSeenAt" | "sellerMarkedSoldAt" | "buyerConfirmedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["purchaseRequest"]>
 export type PurchaseRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -782,6 +821,7 @@ export type $PurchaseRequestPayload<ExtArgs extends runtime.Types.Extensions.Int
     buyerId: string
     status: $Enums.RequestStatus
     note: string | null
+    sellerSeenAt: Date | null
     sellerMarkedSoldAt: Date | null
     buyerConfirmedAt: Date | null
     createdAt: Date
@@ -1216,6 +1256,7 @@ export interface PurchaseRequestFieldRefs {
   readonly buyerId: Prisma.FieldRef<"PurchaseRequest", 'String'>
   readonly status: Prisma.FieldRef<"PurchaseRequest", 'RequestStatus'>
   readonly note: Prisma.FieldRef<"PurchaseRequest", 'String'>
+  readonly sellerSeenAt: Prisma.FieldRef<"PurchaseRequest", 'DateTime'>
   readonly sellerMarkedSoldAt: Prisma.FieldRef<"PurchaseRequest", 'DateTime'>
   readonly buyerConfirmedAt: Prisma.FieldRef<"PurchaseRequest", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"PurchaseRequest", 'DateTime'>

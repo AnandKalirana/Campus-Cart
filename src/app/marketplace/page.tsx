@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { ProductCard } from "@/components/products/product-card";
 import { FilterForm } from "@/components/marketplace/filter-form";
 import { parseSearchParams, type SearchParams } from "@/lib/validation/listing";
@@ -8,6 +9,8 @@ import { listCategoriesAndCampuses, searchListings } from "@/services/listing-se
 import { PAGE_SIZE } from "@/lib/listing-format";
 import { getCurrentUser } from "@/lib/session";
 import { savedIdsFor } from "@/services/wishlist-service";
+import { CAMPUS_COOKIE, effectiveCampus } from "@/lib/campus-cookie";
+import { DEFAULT_CAMPUS_SLUG } from "@/lib/catalog";
 
 export const metadata: Metadata = { title: "Marketplace", description: "Browse student listings from your campus. No account needed to look around." };
 
@@ -22,12 +25,15 @@ function pageHref(p: SearchParams, page: number) {
 }
 
 async function Results({ searchParams }: Props) {
-  const p = parseSearchParams(await searchParams);
+  let p = parseSearchParams(await searchParams);
   const user = await getCurrentUser();
   let data;
   try {
-    const [meta, res] = await Promise.all([listCategoriesAndCampuses(), searchListings(p)]);
-    data = { meta, res };
+    const meta = await listCategoriesAndCampuses();
+    // The header's campus picker is a cookie, so it applies here on the server. ?campus= in the URL wins; "all" means every campus.
+    const campus = effectiveCampus(p.campus, (await cookies()).get(CAMPUS_COOKIE)?.value, meta.campuses.map(c => c.slug), DEFAULT_CAMPUS_SLUG);
+    p = { ...p, campus: campus ?? "all" };
+    data = { meta, res: await searchListings(p) };
   } catch {
     return (
       <div className="mx-auto max-w-[1400px] px-5 py-16"><p role="alert" className="bru-card p-8 text-xl font-bold">We couldn&apos;t load listings right now. Please try again in a moment.</p></div>
@@ -38,7 +44,7 @@ async function Results({ searchParams }: Props) {
   return (
     <div className="mx-auto max-w-[1400px] px-5 pb-24 pt-12 lg:px-6">
       <h1 className="font-raw text-[clamp(2.5rem,7vw,5rem)] leading-[0.9]">Find your <span className="underline decoration-8 underline-offset-8">next find</span></h1>
-      <div className="mt-8"><FilterForm p={p} categories={meta.categories} campuses={meta.campuses} /></div>
+      <div className="mt-8">{/* remount on change: the fields are uncontrolled, so a soft navigation (campus picker) would otherwise leave them showing old values */}<FilterForm key={JSON.stringify([p.q, p.category, p.campus, p.condition, p.min, p.max, p.sort])} p={p} categories={meta.categories} campuses={meta.campuses} /></div>
       <p className="mt-8 text-lg font-bold" role="status" aria-live="polite">
         {res.total === 0 ? "No listings match." : `${res.total} listing${res.total === 1 ? "" : "s"}${p.q ? ` for “${p.q}”` : ""}`}
         {res.pages > 1 && ` · page ${res.page} of ${res.pages}`}

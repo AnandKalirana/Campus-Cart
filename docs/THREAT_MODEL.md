@@ -40,3 +40,11 @@ Actors: anonymous visitors, malicious students, a student with a stolen session,
 | Accidental loss of the last admin | admin accounts cannot self-delete | integration test | admins must be demoted by another admin first |
 | Orphaned photos after delete | blobs deleted after the row; failures logged (`photosFailed`), never block the user | test with a failing store | orphan blobs stay until cleaned up manually |
 | Data lingering | backups are not purged on deletion | not tested | backup retention period undefined (placeholder) |
+
+## Offer status and campus scoping (added with the "seen"/"deal done" and campus-picker change)
+
+| Surface | Control | Verified by | Known limit |
+|---|---|---|---|
+| `POST /api/purchase-requests/:id/seen` | same-origin + login + shared offer limiter; only the listing's seller may set it, everyone else (including the buyer) gets the same 404 as a missing id; idempotent | integration test: stranger and buyer refused, second open changes nothing | none known |
+| `PATCH /api/purchase-requests/:id` | strangers get 404 (no id probing); transitions checked server-side; status change is compare-and-set so a double click or second device cannot apply it twice | integration tests: IDOR, double accept, one accepted offer per listing | transaction runs at default isolation, so two simultaneous accepts of different offers rely on the in-transaction check, not a database constraint |
+| `cc_campus` cookie (client-controlled) | value must match `^[a-z0-9-]{1,60}$` and exist as an active campus, otherwise ignored; it only narrows a public listing filter and is never used for authorization | unit tests: malformed and unknown values ignored | listing detail pages remain reachable by direct link from any campus (browse is scoped, not access) |
