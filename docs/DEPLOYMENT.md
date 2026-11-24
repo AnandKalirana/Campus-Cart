@@ -17,7 +17,7 @@ Keep separate Neon branches / databases and separate secrets for development, st
 | `CRON_SECRET` | yes | 16+ random characters. Vercel sends it as a Bearer token to `/api/cron/rate-limit-cleanup`; without it that endpoint answers 503 |
 | `RATE_LIMIT_STORE` | no | `postgres` (default) or `memory` (dev/test only: per instance) |
 | `RL_LOGIN_IP`, `RL_LOGIN_ACCOUNT`, `RL_SIGNUP_IP`, `RL_SIGNUP_EMAIL`, `RL_FORGOT_IP`, `RL_FORGOT_EMAIL`, `RL_RESET_IP`, `RL_VERIFY_IP` | no | override default limits, see `docs/RATE_LIMITING.md` |
-| `MAIL_DRIVER`, `MAIL_FROM`, `RESEND_API_KEY` or `BREVO_API_KEY` | yes | `MAIL_DRIVER=resend` or `brevo`. `MAIL_FROM` must be a sender/domain verified at the provider. With the default `log` driver, production refuses to send (sign-up still works, mails are not delivered, errors are logged as `mail_failed`) |
+| `MAIL_DRIVER`, `MAIL_FROM`, `RESEND_API_KEY` or `BREVO_API_KEY` | yes | `MAIL_DRIVER=resend` or `brevo`. `MAIL_FROM` must be a sender/domain verified at the provider. With the default `log` driver, production refuses to send (sign-up still works, mails are not delivered, errors are logged as `mail_failed`) Step-by-step: `docs/EMAIL_SETUP.md`; check with `npm run mail:test -- you@example.com` |
 
 ## First deploy checklist
 1. `npm run db:deploy` against the new database; confirm `prisma migrate status` is clean.
