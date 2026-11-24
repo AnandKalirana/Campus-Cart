@@ -34,7 +34,7 @@ TEST_DATABASE_URL=postgresql://... AUTH_SECRET=<32+ chars> npm test   # + DB int
 Point `TEST_DATABASE_URL` at a disposable database created with `prisma migrate deploy`.
 
 ## Scripts
-`dev` · `build` · `start` · `lint` · `typecheck` · `db:migrate` · `db:deploy` · `db:seed` · `db:studio`
+`dev` · `build` · `start` · `lint` · `typecheck` · `db:migrate` · `db:deploy` · `db:seed` · `db:studio` · `mail:test`
 
 ## Status
 | Area | State |
